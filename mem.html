@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Супер Генератор Мемов</title>
+<style>
+body { font-family: Arial; text-align: center; background: #f0f0f0; padding: 20px; }
+canvas { border: 2px solid #333; margin-top: 10px; max-width: 100%; height: auto; cursor: default; }
+input, select, button { margin: 5px; padding: 8px; font-size: 16px; }
+.color-input { width: 50px; }
+#controls { display: flex; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
+.control-group { margin: 5px; }
+</style>
+</head>
+<body>
+
+<h2>Супер Генератор Мемов</h2>
+
+<div id="controls">
+
+<div class="control-group">
+<label>Шаблон:</label><br>
+<select id="templateSelect">
+    <option value="https://i.imgflip.com/1bij.jpg">One Does Not Simply</option>
+    <option value="https://i.imgflip.com/26am.jpg">Grumpy Cat</option>
+    <option value="https://i.imgflip.com/9ehk.jpg">Distracted Boyfriend</option>
+    <option value="https://i.imgflip.com/1otk96.jpg">Drake Hotline Bling</option>
+    <option value="https://i.imgflip.com/2fm6x.jpg">Success Kid</option>
+    <option value="https://i.imgflip.com/1ur9b0.jpg">Change My Mind</option>
+</select>
+</div>
+
+<div class="control-group">
+<label>Или загрузка:</label><br>
+<input type="file" id="imgInput" accept="image/*">
+</div>
+
+<div class="control-group">
+<label>Текст:</label><br>
+<input type="text" id="memeText" placeholder="Введите текст">
+</div>
+
+<div class="control-group">
+<label>Шрифт:</label><br>
+<select id="fontSelect">
+    <option value="Impact">Impact</option>
+    <option value="Arial">Arial</option>
+    <option value="Comic Sans MS">Comic Sans MS</option>
+    <option value="Tahoma">Tahoma</option>
+</select>
+</div>
+
+<div class="control-group">
+<label>Цвет текста:</label><br>
+<input type="color" id="textColor" class="color-input" value="#FFFFFF">
+</div>
+
+<div class="control-group">
+<label>Обводка:</label><br>
+<input type="color" id="strokeColor" class="color-input" value="#000000">
+</div>
+
+<div class="control-group">
+<label>Размер:</label><br>
+<input type="number" id="fontSize" value="50" style="width:60px">
+</div>
+
+<div class="control-group">
+<label>Тень:</label><br>
+<input type="checkbox" id="shadow"> Включить
+</div>
+
+</div>
+
+<button onclick="addText()">Добавить текст на мем</button>
+<button onclick="clearText()">Очистить текст</button>
+<button onclick="downloadMeme()">Скачать мем</button>
+
+<br>
+<canvas id="memeCanvas" width="500" height="500"></canvas>
+
+<script>
+const canvas = document.getElementById("memeCanvas");
+const ctx = canvas.getContext("2d");
+
+let img = new Image();
+let texts = [];
+let selectedText = null;
+let offsetX, offsetY;
+
+const templateSelect = document.getElementById("templateSelect");
+const imgInput = document.getElementById("imgInput");
+const memeText = document.getElementById("memeText");
+
+templateSelect.addEventListener("change", () => { img.src = templateSelect.value; });
+imgInput.addEventListener("change", e => {
+    const file = e.target.files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload = event => { img.src = event.target.result; };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Устанавливаем шаблон по умолчанию
+img.src = templateSelect.value;
+
+// Обновляем мем при загрузке картинки
+img.onload = drawMeme;
+
+function addText(){
+    if(!memeText.value) return;
+    texts.push({
+        text: memeText.value,
+        x: canvas.width/2,
+        y: canvas.height/2,
+        font: document.getElementById("fontSelect").value,
+        size: parseInt(document.getElementById("fontSize").value),
+        color: document.getElementById("textColor").value,
+        stroke: document.getElementById("strokeColor").value,
+        shadow: document.getElementById("shadow").checked
+    });
+    memeText.value = "";
+    drawMeme();
+}
+
+function clearText(){ texts = []; drawMeme(); }
+
+function drawMeme(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(img.width && img.height){
+        canvas.width = img.width;
+        canvas.height = img.height;
+    }
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+
+> Aya:
+texts.forEach(t=>{
+        ctx.font = ${t.size}px ${t.font};
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        if(t.shadow){
+            ctx.shadowColor = "rgba(0,0,0,0.7)";
+            ctx.shadowOffsetX = 3;
+            ctx.shadowOffsetY = 3;
+            ctx.shadowBlur = 4;
+        } else {
+            ctx.shadowColor = "transparent";
+        }
+        ctx.fillStyle = t.color;
+        ctx.strokeStyle = t.stroke;
+        ctx.lineWidth = t.size/15;
+        ctx.strokeText(t.text, t.x, t.y);
+        ctx.fillText(t.text, t.x, t.y);
+    });
+}
+
+// Drag & Drop текста
+canvas.addEventListener("mousedown", e=>{
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    selectedText = null;
+    for(let i=texts.length-1;i>=0;i--){
+        ctx.font = ${texts[i].size}px ${texts[i].font};
+        const w = ctx.measureText(texts[i].text).width;
+        const h = texts[i].size;
+        if(mx > texts[i].x - w/2 && mx < texts[i].x + w/2 && my > texts[i].y - h/2 && my < texts[i].y + h/2){
+            selectedText = texts[i];
+            offsetX = mx - selectedText.x;
+            offsetY = my - selectedText.y;
+            break;
+        }
+    }
+});
+canvas.addEventListener("mousemove", e=>{
+    if(selectedText){
+        const rect = canvas.getBoundingClientRect();
+        selectedText.x = e.clientX - rect.left - offsetX;
+        selectedText.y = e.clientY - rect.top - offsetY;
+        drawMeme();
+    }
+});
+canvas.addEventListener("mouseup", ()=>{ selectedText = null; });
+canvas.addEventListener("mouseleave", ()=>{ selectedText = null; });
+
+function downloadMeme(){
+    const link = document.createElement("a");
+    link.download = "meme.png";
+    link.href = canvas.toDataURL();
+    link.click();
+}
+</script>
+
+</body>
+</html>
