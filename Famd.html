@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FamdConnect - Социальная сеть</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <!-- Firebase SDK v9 -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0f1419;
+            color: #e7e9ea;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* Аутентификация */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-modal {
+            background: #15202b;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            border: 1px solid #2f3336;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header i {
+            font-size: 40px;
+            color: #1d9bf0;
+            margin-bottom: 10px;
+        }
+
+        .auth-header h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #2f3336;
+        }
+
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            border-bottom-color: #1d9bf0;
+            color: #1d9bf0;
+            font-weight: 600;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #8b98a5;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #253341;
+            border: 1px solid #2f3336;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #1d9bf0;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: #1d9bf0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        .auth-btn:hover {
+            background: #1a8cd8;
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #8b98a5;
+            font-size: 14px;
+        }
+
+        .auth-footer a {
+            color: #1d9bf0;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Боковая панель */
+        .sidebar {
+            width: 275px;
+            padding: 20px;
+            border-right: 1px solid #2f3336;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo i {
+            font-size: 30px;
+            color: #1d9bf0;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: white;
+            font-size: 20px;
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item.active {
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            width: 26px;
+            text-align: center;
+        }
+
+        .create-post-btn {
+            background-color: #1d9bf0;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 30px;
+            font-size: 17px;
+            font-weight: 600;
+            margin: 20px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .create-post-btn:hover {
+            background-color: #1a8cd8;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 30px;
+            margin-top: auto;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .user-profile:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+
+        .user-info {
+            flex-grow: 1;
+        }
+
+        .user-info strong {
+            font-size: 15px;
+            display: block;
+        }
+
+        .user-info span {
+            color: #8b98a5;
+            font-size: 14px;
+        }
+
+        /* Основной контент */
+        .main-content {
+            flex: 1;
+            max-width: 600px;
+            border-right: 1px solid #2f3336;
+        }
+
+        .main-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #2f3336;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background-color: rgba(21, 32, 43, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .create-post {
+            display: flex;
+            padding: 20px;
+            border-bottom: 1px solid #2f3336;
+        }
+
+        .create-post img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .post-form {
+            flex: 1;
+        }
+
+        .post-form textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            resize: none;
+            min-height: 60px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .post-form textarea::placeholder {
+            color: #8b98a5;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #2f3336;
+        }
+
+        .action-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-icons button {
+            background: transparent;
+            border: none;
+            color: #1d9bf0;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .action-icons button:hover {
+            background-color: rgba(29, 155, 240, 0.1);
+        }
+
+        .publish-btn {
+            background-color: #1d9bf0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .publish-btn:hover:not(:disabled) {
+            background-color: #1a8cd8;
+        }
+
+        .publish-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Лента постов */
+        .posts-container {
+            padding-bottom: 50px;
+        }
+
+        .post {
+            padding: 20px;
+            border-bottom: 1px solid #2f3336;
+            transition: background 0.3s;
+            position: relative;
+        }
+
+        .post:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .post-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .post-author {
+            flex-grow: 1;
+        }
+
+        .post-author strong {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .post-author span {
+            color: #8b98a5;
+            font-size: 15px;
+        }
+
+        .post-content {
+            margin: 15px 0;
+            font-size: 17px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .post-image-container {
+            margin-top: 15px;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .post-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .post-image:hover {
+            transform: scale(1.01);
+        }
+
+        .post-actions-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            padding: 0 10px;
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #8b98a5;
+            cursor: pointer;
+            transition: color 0.3s;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .post-action:hover {
+            background-color: rgba(29, 155, 240, 0.1);
+            color: #1d9bf0;
+        }
+
+        .post-action.liked {
+            color: #f91880;
+        }
+
+        .post-action.retweeted {
+            color: #00ba7c;
+        }
+
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2001;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+        }
+
+        .notification.success {
+            background: #1c422c;
+            border: 1px solid #1c5c3a;
+            color: #6bff95;
+        }
+
+        .notification.error {
+            background: #421c1c;
+            border: 1px solid #5c1c1c;
+            color: #ff6b6b;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Загрузка */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b98a5;
+        }
+
+        .loading i {
+            margin-right: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1100px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid #2f3336;
+            }
+            .main-content {
+                max-width: 100%;
+                border-right: none;
+            }
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #15202b;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow: hidden;
+            border: 1px solid #2f3336;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #2f3336;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #8b98a5;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Изображения */
+        .image-preview {
+            margin-top: 15px;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-preview img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Cloudinary Upload Widget */
+        .cloudinary-button {
+            background: #1d9bf0;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+
+        .cloudinary-button:hover {
+            background: #1a8cd8;
+        }
+
+        /* Каналы */
+        .channels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .channel-card {
+            background: #253341;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .channel-card:hover {
+            transform: translateY(-5px);
+            background: #2d4252;
+        }
+
+        .channel-icon {
+            width: 50px;
+            height: 50px;
+            background: #1d9bf0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .channel-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .channel-description {
+            color: #8b98a5;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .channel-members {
+            color: #8b98a5;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Окно аутентификации -->
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-modal">
+            <div class="auth-header">
+                <i class="fas fa-users"></i>
+                <h2>Добро пожаловать в FamdConnect</h2>
+                <p>Присоединяйтесь к сообществу</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="showAuthForm('login')">Вход</div>
+                <div class="auth-tab" onclick="showAuthForm('register')">Регистрация</div>
+            </div>
+            
+            <!-- Форма входа -->
+            <div id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="Ваш email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <input type="password" id="loginPassword" placeholder="Ваш пароль">
+                </div>
+                <button class="auth-btn" onclick="login()" id="loginBtn">
+                    <span>Войти</span>
+                </button>
+                <div class="auth-footer">
+                    Нет аккаунта? <a onclick="showAuthForm('register')">Зарегистрируйтесь</a>
+                </div>
+            </div>
+            
+            <!-- Форма регистрации -->
+            <div id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="registerName">Имя пользователя</label>
+                    <input type="text" id="registerName" placeholder="Придумайте имя">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" placeholder="Ваш email">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Пароль</label>
+                    <input type="password" id="registerPassword" placeholder="Не менее 6 символов">
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Подтвердите пароль</label>
+                    <input type="password" id="registerConfirmPassword" placeholder="Повторите пароль">
+                </div>
+                <button class="auth-btn" onclick="register()" id="registerBtn">
+                    <span>Зарегистрироваться</span>
+                </button>
+                <div class="auth-footer">
+                    Уже есть аккаунт? <a onclick="showAuthForm('login')">Войдите</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной интерфейс -->
+    <div id="mainApp" style="display: none;">
+        <div class="container">
+            <!-- Боковая панель -->
+            <aside class="sidebar">
+                <div class="logo">
+                    <i class="fas fa-users"></i>
+                    <h1>FamdConnect</h1>
+                </div>
+                <nav class="nav-menu">
+                    <a href="#" class="nav-item active" onclick="showFeed()" id="feedTab">
+                        <i class="fas fa-home"></i> Лента
+                    </a>
+                    <a href="#" class="nav-item" onclick="showChannels()" id="channelsTab">
+                        <i class="fas fa-hashtag"></i> Каналы
+                    </a>
+                    <a href="#" class="nav-item" onclick="showProfile()" id="profileTab">
+                        <i class="fas fa-user"></i> Профиль
+                    </a>
+                </nav>
+                <button class="create-post-btn" onclick="openPostModal()">
+                    <i class="fas fa-feather"></i> Новый пост
+                </button>
+                <div class="user-profile" onclick="showProfile()">
+                    <img id="userAvatarImg" src="https://ui-avatars.com/api/?name=Гость&background=1d9bf0" alt="Аватар">
+                    <div class="user-info">
+                        <strong id="userDisplayName">Загрузка...</strong>
+                        <span id="userEmail">@загрузка</span>
+                    </div>
+                    <button onclick="logout()" style="background: none; border: none; color: #8b98a5; cursor: pointer;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Основная лента -->
+            <main class="main-content">
+                <header class="main-header">
+                    <h2 id="pageTitle">Все посты</h2>
+                    <div id="channelInfo" style="display: none;">
+                        <span id="currentChannelName"></span>
+                        <button onclick="showAllPosts()" style="background: none; border: none; color: #1d9bf0; margin-left: 10px; cursor: pointer;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Контент в зависимости от вкладки -->
+                <div id="contentArea">
+                    <!-- Лента постов -->
+                    <div id="postsContainer" class="posts-container">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i> Загрузка постов...
+                        </div>
+                    </div>
+                    
+                    <!-- Список каналов -->
+                    <div id="channelsContainer" style="display: none; padding: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3>Все каналы</h3>
+                            <button class="cloudinary-button" onclick="openChannelModal()">
+                                <i class="fas fa-plus"></i> Создать канал
+                            </button>
+                        </div>
+                        <div id="channelsList" class="channels-grid">
+                            <!-- Каналы будут загружены здесь -->
+                        </div>
+                    </div>
+                    
+                    <!-- Профиль -->
+                    <div id="profileContainer" style="display: none; padding: 20px;">
+                        <!-- Профиль будет загружен здесь -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания поста -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Новый пост</h3>
+                <button class="close-btn" onclick="closePostModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="create-post">
+                    <img id="modalUserAvatar" src="https://ui-avatars.com/api/?name=Гость&background=1d9bf0" alt="Аватар">
+                    <div class="post-form">
+                        <textarea id="postContent" placeholder="Что нового?" rows="4"></textarea>
+                        <div class="post-actions">
+                            <div class="action-icons">
+                                <button onclick="openCloudinaryWidget()" title="Добавить изображение">
+                                    <i class="fas fa-image"></i>
+                                </button>
+                                <button onclick="selectChannelForPost()" title="Выбрать канал">
+                                    <i class="fas fa-hashtag"></i>
+                                </button>
+                            </div>
+                            <button class="publish-btn" onclick="createPost()" id="publishBtn">
+                                Опубликовать
+                            </button>
+                        </div>
+                        <div id="imagePreview" class="image-preview"></div>
+                        <div id="selectedChannelBadge" style="margin-top: 10px; display: none;">
+                            <span style="background: rgba(29, 155, 240, 0.1); color: #1d9bf0; padding: 5px 10px; border-radius: 15px; font-size: 14px;">
+                                <i class="fas fa-hashtag"></i> <span id="selectedChannelName"></span>
+                                <button onclick="clearSelectedChannel()" style="background: none; border: none; color: #8b98a5; margin-left: 5px; cursor: pointer;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно выбора канала -->
+    <div id="selectChannelModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Выберите канал</h3>
+                <button class="close-btn" onclick="closeSelectChannelModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="channelSelectionList" class="channels-grid">
+                    <!-- Каналы будут загружены здесь -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания канала -->
+    <div id="channelModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Создать канал</h3>
+                <button class="close-btn" onclick="closeChannelModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="channelName">Название канала</label>
+                    <input type="text" id="channelName" placeholder="Название вашего канала">
+                </div>
+                <div class="form-group">
+                    <label for="channelDescription">Описание</label>
+                    <textarea id="channelDescription" placeholder="Опишите тему канала" rows="3" style="width: 100%; padding: 12px; background: #253341; border: 1px solid #2f3336; border-radius: 8px; color: white;"></textarea>
+                </div>
+                <button class="auth-btn" onclick="createChannel()" id="createChannelBtn">
+                    Создать канал
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== КОНФИГУРАЦИЯ ==========
+        // Firebase конфигурация (ВАША КОНФИГУРАЦИЯ)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDt04qUBk6fXq58NE9zoA5Q3yWWpk_KK8s",
+            authDomain: "famdshop-2196c.firebaseapp.com",
+            databaseURL: "https://famdshop-2196c-default-rtdb.firebaseio.com",
+            projectId: "famdshop-2196c",
+            storageBucket: "famdshop-2196c.firebasestorage.app",
+            messagingSenderId: "75598057700",
+            appId: "1:75598057700:web:7274d018a585e599381cf1",
+            measurementId: "G-F977PSHJTC"
+        };
+
+        // Cloudinary конфигурация (БЕСПЛАТНЫЙ АККАУНТ ДЛЯ ТЕСТА)
+        const cloudinaryConfig = {
+            cloudName: 'dtm41qpxc', // Мой тестовый cloud_name
+            uploadPreset: 'ml_default', // Стандартный preset
+            apiKey: 'demo_key' // Для виджета не нужен api_key
+        };
+
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        // Инициализируем Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Получаем ссылки на сервисы Firebase
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Глобальные переменные
+        let currentUser = null;
+        let unsubscribePosts = null;
+        let unsubscribeChannels = null;
+        let currentImageUrl = null;
+        let selectedChannelId = null;
+        let selectedChannelName = null;
+        let currentView = 'feed';
+
+        // ========== АУТЕНТИФИКАЦИЯ ==========
+        // Проверяем состояние аутентификации при загрузке
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                console.log("Пользователь вошел:", user.email);
+                showMainApp();
+                updateUserUI();
+                
+                // Загружаем контент в зависимости от текущей вкладки
+                if (currentView === 'feed') {
+                    loadPosts();
+                } else if (currentView === 'channels') {
+                    loadChannels();
+                } else if (currentView === 'profile') {
+                    loadProfile();
+                }
+            } else {
+                console.log("Пользователь вышел");
+                showAuthOverlay();
+                if (unsubscribePosts) unsubscribePosts();
+                if (unsubscribeChannels) unsubscribeChannels();
+            }
+        });
+
+        // Функции аутентификации
+        window.showAuthForm = function(form) {
+            document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+            
+            if (form === 'login') {
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        };
+
+        window.login = async function() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            if (!email || !password) {
+                showNotification('Заполните все поля', 'error');
+                return;
+            }
+            
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Вход...';
+            loginBtn.disabled = true;
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showNotification('Вход выполнен успешно!', 'success');
+            } catch (error) {
+                console.error('Ошибка входа:', error);
+                showNotification(getErrorMessage(error), 'error');
+            } finally {
+                loginBtn.innerHTML = '<span>Войти</span>';
+                loginBtn.disabled = false;
+            }
+        };
+
+        window.register = async function() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            const registerBtn = document.getElementById('registerBtn');
+            
+            if (!name || !email || !password || !confirmPassword) {
+                showNotification('Заполните все поля', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showNotification('Пароль должен быть не менее 6 символов', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showNotification('Пароли не совпадают', 'error');
+                return;
+            }
+            
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Регистрация...';
+            registerBtn.disabled = true;
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                
+                // Обновляем профиль
+                await userCredential.user.updateProfile({
+                    displayName: name,
+                    photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1d9bf0&color=fff`
+                });
+                
+                // Создаем запись пользователя в Firestore
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    uid: userCredential.user.uid,
+                    displayName: name,
+                    email: email,
+                    photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1d9bf0&color=fff`,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    channels: []
+                });
+                
+                showNotification('Регистрация успешна!', 'success');
+                
+            } catch (error) {
+                console.error('Ошибка регистрации:', error);
+                showNotification(getErrorMessage(error), 'error');
+            } finally {
+                registerBtn.innerHTML = '<span>Зарегистрироваться</span>';
+                registerBtn.disabled = false;
+            }
+        };
+
+        window.logout = async function() {
+            try {
+                await auth.signOut();
+                showNotification('Вы вышли из системы', 'success');
+            } catch (error) {
+                console.error('Ошибка выхода:', error);
+                showNotification('Ошибка при выходе', 'error');
+            }
+        };
+
+        // ========== ПОСТЫ ==========
+        window.openPostModal = function() {
+            document.getElementById('postModal').style.display = 'flex';
+            document.getElementById('postContent').focus();
+        };
+
+        window.closePostModal = function() {
+            document.getElementById('postModal').style.display = 'none';
+            document.getElementById('postContent').value = '';
+            clearImagePreview();
+            clearSelectedChannel();
+        };
+
+        // Cloudinary Upload Widget
+        window.openCloudinaryWidget = function() {
+            const myWidget = cloudinary.createUploadWidget({
+                cloudName: cloudinaryConfig.cloudName,
+                uploadPreset: cloudinaryConfig.uploadPreset,
+                sources: ['local', 'url', 'camera'],
+                multiple: false,
+                maxFileSize: 5000000, // 5MB
+                clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                maxImageWidth: 2000,
+                maxImageHeight: 2000,
+                cropping: true,
+                croppingAspectRatio: 16/9,
+                showPoweredBy: false,
+                styles: {
+                    palette: {
+                        window: "#15202B",
+                        sourceBg: "#253341",
+                        windowBorder: "#2F3336",
+                        tabIcon: "#1D9BF0",
+                        inactiveTabIcon: "#8B98A5",
+                        menuIcons: "#1D9BF0",
+                        link: "#1D9BF0",
+                        action: "#1D9BF0",
+                        inProgress: "#00B67A",
+                        complete: "#00B67A",
+                        error: "#ED5F74",
+                        textDark: "#000000",
+                        textLight: "#FFFFFF"
+                    }
+                }
+            }, (error, result) => {
+                if (!error && result && result.event === "success") {
+                    currentImageUrl = result.info.secure_url;
+                    showImagePreview(currentImageUrl);
+                    showNotification('Изображение загружено!', 'success');
+                } else if (error) {
+                    console.error('Cloudinary error:', error);
+                    showNotification('Ошибка загрузки изображения', 'error');
+                }
+            });
+
+            myWidget.open();
+        };
+
+        function showImagePreview(imageUrl) {
+            document.getElementById('imagePreview').innerHTML = `
+                <img src="${imageUrl}" alt="Предпросмотр">
+                <button class="remove-image-btn" onclick="clearImagePreview()">×</button>
+            `;
+        }
+
+        window.clearImagePreview = function() {
+            document.getElementById('imagePreview').innerHTML = '';
+            currentImageUrl = null;
+        };
+
+        window.selectChannelForPost = function() {
+            openSelectChannelModal();
+        };
+
+        window.clearSelectedChannel = function() {
+            selectedChannelId = null;
+            selectedChannelName = null;
+            document.getElementById('selectedChannelBadge').style.display = 'none';
+        };
+
+        window.openSelectChannelModal = function() {
+            // Показываем модальное окно
+            document.getElementById('selectChannelModal').style.display = 'flex';
+            
+            // Загружаем каналы пользователя
+            loadUserChannelsForSelection();
+        };
+
+        window.closeSelectChannelModal = function() {
+            document.getElementById('selectChannelModal').style.display = 'none';
+        };
+
+        async function loadUserChannelsForSelection() {
+            try {
+                const channelsQuery = db.collection('channels')
+                    .where('members', 'array-contains', currentUser.uid)
+                    .orderBy('name');
+                
+                const snapshot = await channelsQuery.get();
+                const channelList = document.getElementById('channelSelectionList');
+                channelList.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    channelList.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #8b98a5;">
+                            <i class="fas fa-hashtag" style="font-size: 48px; margin-bottom: 20px;"></i>
+                            <p>Вы не состоите в каналах</p>
+                            <button class="cloudinary-button" onclick="closeSelectChannelModal(); openChannelModal();">
+                                Создать первый канал
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                snapshot.forEach((doc) => {
+                    const channel = doc.data();
+                    const channelElement = document.createElement('div');
+                    channelElement.className = 'channel-card';
+                    channelElement.innerHTML = `
+                        <div class="channel-icon">${channel.name.charAt(0).toUpperCase()}</div>
+                        <div class="channel-name">${channel.name}</div>
+                        <div class="channel-description">${channel.description || 'Без описания'}</div>
+                        <div class="channel-members">
+                            <i class="fas fa-user"></i> ${channel.memberCount || 1} участников
+                        </div>
+                    `;
+                    channelElement.onclick = () => {
+                        selectedChannelId = doc.id;
+                        selectedChannelName = channel.name;
+                        document.getElementById('selectedChannelName').textContent = channel.name;
+                        document.getElementById('selectedChannelBadge').style.display = 'block';
+                        closeSelectChannelModal();
+                    };
+                    channelList.appendChild(channelElement);
+                });
+                
+            } catch (error) {
+                console.error('Ошибка загрузки каналов:', error);
+                showNotification('Ошибка загрузки каналов', 'error');
+            }
+        }
+
+        window.createPost = async function() {
+            const content = document.getElementById('postContent').value.trim();
+            const publishBtn = document.getElementById('publishBtn');
+            
+            if (!content && !currentImageUrl) {
+                showNotification('Добавьте текст или изображение', 'error');
+                return;
+            }
+            
+            publishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Публикация...';
+            publishBtn.disabled = true;
+            
+            try {
+                // Создаем пост в Firestore
+                const postData = {
+                    content: content,
+                    imageUrl: currentImageUrl || null,
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName || 'Пользователь',
+                    userAvatar: currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName || 'User')}&background=1d9bf0`,
+                    likes: 0,
+                    likesCount: 0,
+                    comments: 0,
+                    channelId: selectedChannelId || null,
+                    channelName: selectedChannelName || null,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    timestamp: Date.now()
+                };
+                
+                // Добавляем пост в коллекцию posts
+                const docRef = await db.collection('posts').add(postData);
+                console.log('Пост создан с ID:', docRef.id);
+                
+                // Если пост в канале, обновляем статистику канала
+                if (selectedChannelId) {
+                    await db.collection('channels').doc(selectedChannelId).update({
+                        postCount: firebase.firestore.FieldValue.increment(1),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                
+                // Очищаем форму
+                document.getElementById('postContent').value = '';
+                clearImagePreview();
+                clearSelectedChannel();
+                closePostModal();
+                
+                showNotification('Пост опубликован!', 'success');
+                
+            } catch (error) {
+                console.error('Ошибка публикации поста:', error);
+                showNotification('Ошибка при публикации поста: ' + error.message, 'error');
+            } finally {
+                publishBtn.innerHTML = 'Опубликовать';
+                publishBtn.disabled = false;
+            }
+        };
+
+        // Загрузка постов в реальном времени
+        function loadPosts(channelId = null) {
+            const postsContainer = document.getElementById('postsContainer');
+            postsContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> Загрузка постов...</div>';
+            
+            // Отписываемся от предыдущего слушателя, если он есть
+            if (unsubscribePosts) {
+                unsubscribePosts();
+            }
+            
+            // Создаем запрос
+            let postsQuery;
+            if (channelId) {
+                // Посты только из определенного канала
+                postsQuery = db.collection('posts')
+                    .where('channelId', '==', channelId)
+                    .orderBy('timestamp', 'desc')
+                    .limit(50);
+            } else {
+                // Все посты
+                postsQuery = db.collection('posts')
+                    .orderBy('timestamp', 'desc')
+                    .limit(50);
+            }
+            
+            // Слушаем изменения в реальном времени
+            unsubscribePosts = postsQuery.onSnapshot((snapshot) => {
+                console.log('Получено постов:', snapshot.size);
+                
+                if (snapshot.empty) {
+                    postsContainer.innerHTML = `
+                        <div class="post">
+                            <div class="post-content" style="text-align: center; padding: 40px; color: #8b98a5;">
+                                Здесь пока нет постов. Будьте первым!
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                postsContainer.innerHTML = '';
+                
+                snapshot.forEach((doc) => {
+                    const post = doc.data();
+                    post.id = doc.id;
+                    const postElement = createPostElement(post);
+                    postsContainer.appendChild(postElement);
+                });
+                
+            }, (error) => {
+                console.error('Ошибка загрузки постов:', error);
+                postsContainer.innerHTML = `
+                    <div class="post">
+                        <div class="post-content" style="text-align: center; padding: 40px; color: #ff6b6b;">
+                            Ошибка загрузки постов: ${error.message}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function createPostElement(post) {
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post';
+            postDiv.dataset.id = post.id;
+            
+            // Форматируем дату
+            const date = post.createdAt ? post.createdAt.toDate() : new Date(post.timestamp);
+            const timeAgo = getTimeAgo(date);
+            
+            let imageHtml = '';
+            if (post.imageUrl) {
+                imageHtml = `
+                    <div class="post-image-container" onclick="openImageModal('${post.imageUrl}')">
+                        <img src="${post.imageUrl}" class="post-image" alt="Изображение поста">
+                    </div>
+                `;
+            }
+            
+            let channelHtml = '';
+            if (post.channelName) {
+                channelHtml = `
+                    <div style="margin-top: 5px;">
+                        <span style="background: rgba(29, 155, 240, 0.1); color: #1d9bf0; padding: 3px 8px; border-radius: 12px; font-size: 12px;">
+                            <i class="fas fa-hashtag"></i> ${post.channelName}
+                        </span>
+                    </div>
+                `;
+            }
+            
+            postDiv.innerHTML = `
+                <div class="post-header">
+                    <img src="${post.userAvatar}" class="post-avatar" alt="Аватар">
+                    <div class="post-author">
+                        <strong>${post.userName}</strong>
+                        <span>${timeAgo}</span>
+                        ${channelHtml}
+                    </div>
+                </div>
+                <div class="post-content">
+                    ${post.content || ''}
+                    ${imageHtml}
+                </div>
+                <div class="post-actions-bar">
+                    <div class="post-action" onclick="handleLike('${post.id}', ${post.likesCount || 0})">
+                        <i class="far fa-heart"></i>
+                        <span>${post.likesCount || 0}</span>
+                    </div>
+                    <div class="post-action" onclick="handleComment('${post.id}')">
+                        <i class="far fa-comment"></i>
+                        <span>${post.comments || 0}</span>
+                    </div>
+                    <div class="post-action" onclick="handleShare('${post.id}')">
+                        <i class="far fa-share-square"></i>
+                    </div>
+                </div>
+            `;
+            
+            return postDiv;
+        }
+
+        // ========== КАНАЛЫ ==========
+        window.showChannels = function() {
+            currentView = 'channels';
+            updateActiveTab('channelsTab');
+            document.getElementById('pageTitle').textContent = 'Каналы';
+            document.getElementById('channelInfo').style.display = 'none';
+            
+            // Показываем контейнер каналов, скрываем другие
+            document.getElementById('postsContainer').style.display = 'none';
+            document.getElementById('channelsContainer').style.display = 'block';
+            document.getElementById('profileContainer').style.display = 'none';
+            
+            // Загружаем каналы
+            loadChannels();
+        };
+
+        window.showFeed = function() {
+            currentView = 'feed';
+            updateActiveTab('feedTab');
+            document.getElementById('pageTitle').textContent = 'Все посты';
+            document.getElementById('channelInfo').style.display = 'none';
+            
+            // Показываем ленту, скрываем другие
+            document.getElementById('postsContainer').style.display = 'block';
+            document.getElementById('channelsContainer').style.display = 'none';
+            document.getElementById('profileContainer').style.display = 'none';
+            
+            // Загружаем все посты
+            loadPosts();
+        };
+
+        function loadChannels() {
+            const channelsList = document.getElementById('channelsList');
+            channelsList.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> Загрузка каналов...</div>';
+            
+            // Отписываемся от предыдущего слушателя
+            if (unsubscribeChannels) {
+                unsubscribeChannels();
+            }
+            
+            // Загружаем все каналы
+            const channelsQuery = db.collection('channels')
+                .orderBy('memberCount', 'desc')
+                .limit(20);
+            
+            unsubscribeChannels = channelsQuery.onSnapshot((snapshot) => {
+                console.log('Получено каналов:', snapshot.size);
+                
+                if (snapshot.empty) {
+                    channelsList.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #8b98a5;">
+                            <i class="fas fa-hashtag" style="font-size: 48px; margin-bottom: 20px;"></i>
+                            <p>Пока нет каналов</p>
+                            <button class="cloudinary-button" onclick="openChannelModal()">
+                                Создать первый канал
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                channelsList.innerHTML = '';
+                
+                snapshot.forEach((doc) => {
+                    const channel = doc.data();
+                    const channelElement = createChannelElement(doc.id, channel);
+                    channelsList.appendChild(channelElement);
+                });
+                
+            }, (error) => {
+                console.error('Ошибка загрузки каналов:', error);
+                channelsList.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ff6b6b;">
+                        Ошибка загрузки каналов: ${error.message}
+                    </div>
+                `;
+            });
+        }
+
+        function createChannelElement(channelId, channel) {
+            const isMember = channel.members && channel.members.includes(currentUser.uid);
+            
+            const channelElement = document.createElement('div');
+            channelElement.className = 'channel-card';
+            channelElement.innerHTML = `
+                <div class="channel-icon">${channel.name.charAt(0).toUpperCase()}</div>
+                <div class="channel-name">${channel.name}</div>
+                <div class="channel-description">${channel.description || 'Без описания'}</div>
+                <div class="channel-members">
+                    <i class="fas fa-user"></i> ${channel.memberCount || 1} участников
+                    <span style="margin-left: 10px; color: ${isMember ? '#00ba7c' : '#8b98a5'};">
+                        ${isMember ? '<i class="fas fa-check"></i> Вы в канале' : ''}
+                    </span>
+                </div>
+            `;
+            
+            channelElement.onclick = () => {
+                if (isMember) {
+                    // Показать посты канала
+                    showChannelPosts(channelId, channel.name);
+                } else {
+                    // Присоединиться к каналу
+                    joinChannel(channelId);
+                }
+            };
+            
+            return channelElement;
+        }
+
+        async function joinChannel(channelId) {
+            try {
+                const channelRef = db.collection('channels').doc(channelId);
+                const channelDoc = await channelRef.get();
+                
+                if (!channelDoc.exists) {
+                    showNotification('Канал не найден', 'error');
+                    return;
+                }
+                
+                const channel = channelDoc.data();
+                const members = channel.members || [];
+                
+                if (members.includes(currentUser.uid)) {
+                    showNotification('Вы уже в этом канале', 'error');
+                    return;
+                }
+                
+                // Добавляем пользователя в канал
+                await channelRef.update({
+                    members: [...members, currentUser.uid],
+                    memberCount: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                // Добавляем канал в список каналов пользователя
+                await db.collection('users').doc(currentUser.uid).update({
+                    channels: firebase.firestore.FieldValue.arrayUnion(channelId)
+                });
+                
+                showNotification('Вы присоединились к каналу!', 'success');
+                
+                // Перезагружаем каналы
+                loadChannels();
+                
+            } catch (error) {
+                console.error('Ошибка присоединения к каналу:', error);
+                showNotification('Ошибка присоединения к каналу', 'error');
+            }
+        }
+
+        function showChannelPosts(channelId, channelName) {
+            currentView = 'feed';
+            updateActiveTab('feedTab');
+            document.getElementById('pageTitle').textContent = 'Лента';
+            
+            // Показываем информацию о канале
+            document.getElementById('currentChannelName').textContent = channelName;
+            document.getElementById('channelInfo').style.display = 'block';
+            
+            // Показываем ленту, скрываем другие
+            document.getElementById('postsContainer').style.display = 'block';
+            document.getElementById('channelsContainer').style.display = 'none';
+            document.getElementById('profileContainer').style.display = 'none';
+            
+            // Загружаем посты канала
+            loadPosts(channelId);
+        }
+
+        window.showAllPosts = function() {
+            showFeed();
+        };
+
+        // Создание канала
+        window.openChannelModal = function() {
+            document.getElementById('channelModal').style.display = 'flex';
+            document.getElementById('channelName').focus();
+        };
+
+        window.closeChannelModal = function() {
+            document.getElementById('channelModal').style.display = 'none';
+            document.getElementById('channelName').value = '';
+            document.getElementById('channelDescription').value = '';
+        };
+
+        window.createChannel = async function() {
+            const name = document.getElementById('channelName').value.trim();
+            const description = document.getElementById('channelDescription').value.trim();
+            const createBtn = document.getElementById('createChannelBtn');
+            
+            if (!name) {
+                showNotification('Введите название канала', 'error');
+                return;
+            }
+            
+            if (name.length > 30) {
+                showNotification('Название канала слишком длинное', 'error');
+                return;
+            }
+            
+            createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Создание...';
+            createBtn.disabled = true;
+            
+            try {
+                const channelData = {
+                    name: name,
+                    description: description,
+                    ownerId: currentUser.uid,
+                    ownerName: currentUser.displayName,
+                    members: [currentUser.uid],
+                    memberCount: 1,
+                    postCount: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                const docRef = await db.collection('channels').add(channelData);
+                console.log('Канал создан с ID:', docRef.id);
+                
+                // Добавляем канал в список каналов пользователя
+                await db.collection('users').doc(currentUser.uid).update({
+                    channels: firebase.firestore.FieldValue.arrayUnion(docRef.id)
+                });
+                
+                showNotification(`Канал "${name}" создан!`, 'success');
+                closeChannelModal();
+                
+                // Переходим в канал
+                showChannelPosts(docRef.id, name);
+                
+            } catch (error) {
+                console.error('Ошибка создания канала:', error);
+                showNotification('Ошибка при создании канала: ' + error.message, 'error');
+            } finally {
+                createBtn.innerHTML = 'Создать канал';
+                createBtn.disabled = false;
+            }
+        };
+
+        // ========== ПРОФИЛЬ ==========
+        window.showProfile = function() {
+            currentView = 'profile';
+            updateActiveTab('profileTab');
+            document.getElementById('pageTitle').textContent = 'Профиль';
+            document.getElementById('channelInfo').style.display = 'none';
+            
+            // Показываем профиль, скрываем другие
+            document.getElementById('postsContainer').style.display = 'none';
+            document.getElementById('channelsContainer').style.display = 'none';
+            document.getElementById('profileContainer').style.display = 'block';
+            
+            loadProfile();
+        };
+
+        function loadProfile() {
+            const profileContainer = document.getElementById('profileContainer');
+            
+            profileContainer.innerHTML = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <img src="${currentUser.photoURL || 'https://ui-avatars.com/api/?name=User&background=1d9bf0'}" 
+                         style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px;">
+                    <h3>${currentUser.displayName || 'Пользователь'}</h3>
+                    <p style="color: #8b98a5;">${currentUser.email}</p>
+                </div>
+                <div style="background: #253341; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 15px;">Статистика</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div style="text-align: center; padding: 15px; background: #15202b; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #1d9bf0;" id="postCount">0</div>
+                            <div style="color: #8b98a5;">Постов</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #15202b; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #00ba7c;" id="channelCount">0</div>
+                            <div style="color: #8b98a5;">Каналов</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #15202b; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #f91880;" id="likeCount">0</div>
+                            <div style="color: #8b98a5;">Лайков</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="background: #253341; border-radius: 16px; padding: 20px;">
+                    <h4 style="margin-bottom: 15px;">Ваши каналы</h4>
+                    <div id="userChannelsList" class="channels-grid">
+                        <!-- Каналы пользователя -->
+                    </div>
+                </div>
+            `;
+            
+            // Загружаем статистику
+            loadUserStats();
+            // Загружаем каналы пользователя
+            loadUserChannels();
+        }
+
+        async function loadUserStats() {
+            try {
+                // Считаем посты пользователя
+                const postsQuery = await db.collection('posts')
+                    .where('userId', '==', currentUser.uid)
+                    .get();
+                
+                document.getElementById('postCount').textContent = postsQuery.size;
+                
+                // Считаем каналы пользователя
+                const channelsQuery = await db.collection('channels')
+                    .where('members', 'array-contains', currentUser.uid)
+                    .get();
+                
+                document.getElementById('channelCount').textContent = channelsQuery.size;
+                
+                // Считаем общее количество лайков (нужно будет доработать)
+                document.getElementById('likeCount').textContent = '0';
+                
+            } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+            }
+        }
+
+        async function loadUserChannels() {
+            try {
+                const channelsQuery = db.collection('channels')
+                    .where('members', 'array-contains', currentUser.uid)
+                    .orderBy('updatedAt', 'desc');
+                
+                const snapshot = await channelsQuery.get();
+                const channelsList = document.getElementById('userChannelsList');
+                
+                if (snapshot.empty) {
+                    channelsList.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 20px; color: #8b98a5;">
+                            Вы не состоите в каналах
+                        </div>
+                    `;
+                    return;
+                }
+                
+                channelsList.innerHTML = '';
+                
+                snapshot.forEach((doc) => {
+                    const channel = doc.data();
+                    const channelElement = createChannelElement(doc.id, channel);
+                    channelsList.appendChild(channelElement);
+                });
+                
+            } catch (error) {
+                console.error('Ошибка загрузки каналов пользователя:', error);
+            }
+        }
+
+        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+        function showAuthOverlay() {
+            document.getElementById('authOverlay').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        function showMainApp() {
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+        }
+
+        function updateUserUI() {
+            if (currentUser) {
+                document.getElementById('userDisplayName').textContent = currentUser.displayName || 'Пользователь';
+                document.getElementById('userEmail').textContent = currentUser.email || '@пользователь';
+                document.getElementById('userAvatarImg').src = currentUser.photoURL || 'https://ui-avatars.com/api/?name=User&background=1d9bf0';
+                document.getElementById('modalUserAvatar').src = currentUser.photoURL || 'https://ui-avatars.com/api/?name=User&background=1d9bf0';
+            }
+        }
+
+        function updateActiveTab(activeTabId) {
+            // Убираем active у всех вкладок
+            document.querySelectorAll('.nav-item').forEach(tab => tab.classList.remove('active'));
+            // Добавляем active к выбранной вкладке
+            document.getElementById(activeTabId).classList.add('active');
+        }
+
+        function showNotification(message, type = 'info') {
+            // Удаляем старые уведомления
+            document.querySelectorAll('.notification').forEach(el => el.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Удаляем через 5 секунд
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        function getErrorMessage(error) {
+            const errorMessages = {
+                'auth/email-already-in-use': 'Этот email уже используется',
+                'auth/invalid-email': 'Неверный формат email',
+                'auth/weak-password': 'Пароль слишком слабый',
+                'auth/user-not-found': 'Пользователь не найден',
+                'auth/wrong-password': 'Неверный пароль',
+                'auth/network-request-failed': 'Проблемы с сетью. Проверьте подключение',
+                'permission-denied': 'Нет доступа. Проверьте правила Firebase'
+            };
+            
+            return errorMessages[error.code] || 'Произошла ошибка. Попробуйте снова';
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = now - date;
+            
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) return `${days} дн. назад`;
+            if (hours > 0) return `${hours} ч. назад`;
+            if (minutes > 0) return `${minutes} мин. назад`;
+            return 'Только что';
+        }
+
+        window.handleLike = async function(postId, currentLikes) {
+            try {
+                const postRef = db.collection('posts').doc(postId);
+                await postRef.update({
+                    likesCount: firebase.firestore.FieldValue.increment(1)
+                });
+                showNotification('Лайк добавлен!', 'success');
+            } catch (error) {
+                console.error('Ошибка лайка:', error);
+            }
+        };
+
+        window.handleComment = function(postId) {
+            showNotification('Функция комментариев скоро будет доступна!', 'success');
+        };
+
+        window.handleShare = function(postId) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Посмотрите этот пост в FamdConnect',
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    showNotification('Ссылка скопирована!', 'success');
+                });
+            }
+        };
+
+        window.openImageModal = function(imageUrl) {
+            const imageModal = document.createElement('div');
+            imageModal.className = 'modal';
+            imageModal.style.display = 'flex';
+            imageModal.onclick = function() {
+                document.body.removeChild(imageModal);
+            };
+            
+            imageModal.innerHTML = `
+                <div class="modal-content" style="max-width: 90vw; max-height: 90vh; background: transparent; border: none;" onclick="event.stopPropagation()">
+                    <img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+            `;
+            
+            document.body.appendChild(imageModal);
+        };
+
+        // Горячие клавиши
+        document.addEventListener('keydown', function(e) {
+            // Escape для закрытия модальных окон
+            if (e.key === 'Escape') {
+                closePostModal();
+                closeChannelModal();
+                closeSelectChannelModal();
+            }
+            // Ctrl+Enter для публикации поста
+            if (e.ctrlKey && e.key === 'Enter' && document.getElementById('postModal').style.display === 'flex') {
+                createPost();
+            }
+        });
+
+        // Проверка Firebase
+        db.collection('test').doc('test').get().then(() => {
+            console.log('Firestore подключен');
+        }).catch(error => {
+            console.error('Firestore не подключен:', error);
+            showNotification('Проверьте настройки Firestore в консоли Firebase', 'error');
+        });
+
+        // Показываем окно аутентификации при загрузке
+        showAuthOverlay();
+
+        // Инициализируем Cloudinary
+        console.log('Cloudinary готов к использованию');
+
+    </script>
+</body>
+</html>
