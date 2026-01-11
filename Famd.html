@@ -113,7 +113,7 @@
             font-size: 14px;
         }
 
-        .form-group input {
+        .form-group input, .form-group textarea {
             width: 100%;
             padding: 12px 15px;
             background: #253341;
@@ -124,9 +124,51 @@
             transition: border-color 0.3s;
         }
 
-        .form-group input:focus {
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
             outline: none;
             border-color: #1d9bf0;
+        }
+
+        .avatar-upload {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            border: 3px solid #1d9bf0;
+            cursor: pointer;
+        }
+
+        .channel-avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            border: 3px solid #1d9bf0;
+            cursor: pointer;
+        }
+
+        .upload-btn {
+            background: #1d9bf0;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .auth-btn {
@@ -270,6 +312,7 @@
             height: 40px;
             border-radius: 50%;
             margin-right: 12px;
+            object-fit: cover;
         }
 
         .user-info {
@@ -318,6 +361,7 @@
             border-radius: 50%;
             margin-right: 15px;
             flex-shrink: 0;
+            object-fit: cover;
         }
 
         .post-form {
@@ -417,6 +461,7 @@
             border-radius: 50%;
             margin-right: 12px;
             flex-shrink: 0;
+            object-fit: cover;
         }
 
         .post-author {
@@ -481,7 +526,6 @@
 
         .post-action:hover {
             background-color: rgba(29, 155, 240, 0.1);
-            color: #1d9bf0;
         }
 
         .post-action.liked {
@@ -585,7 +629,7 @@
             width: 90%;
             max-width: 500px;
             max-height: 90vh;
-            overflow: hidden;
+            overflow-y: auto;
             border: 1px solid #2f3336;
         }
 
@@ -595,6 +639,10 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: #15202b;
+            z-index: 1;
         }
 
         .modal-header h3 {
@@ -695,14 +743,21 @@
         .channel-icon {
             width: 50px;
             height: 50px;
-            background: #1d9bf0;
             border-radius: 10px;
+            background: #1d9bf0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             color: white;
             margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .channel-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .channel-name {
@@ -714,6 +769,10 @@
             color: #8b98a5;
             font-size: 14px;
             margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .channel-members {
@@ -722,6 +781,81 @@
             display: flex;
             align-items: center;
             gap: 5px;
+        }
+
+        /* Профиль */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            border: 3px solid #1d9bf0;
+        }
+
+        .edit-avatar-btn {
+            position: absolute;
+            bottom: 20px;
+            right: calc(50% - 60px);
+            background: #1d9bf0;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #253341;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #8b98a5;
+            font-size: 14px;
+        }
+
+        /* Скроллбар */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #15202b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2f3336;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1d9bf0;
         }
     </style>
 </head>
@@ -760,6 +894,13 @@
             
             <!-- Форма регистрации -->
             <div id="registerForm" class="auth-form">
+                <div class="avatar-upload">
+                    <img id="registerAvatarPreview" src="https://ui-avatars.com/api/?name=Новый+пользователь&background=1d9bf0&color=fff" 
+                         class="avatar-preview" alt="Аватар" onclick="uploadRegisterAvatar()">
+                    <button class="upload-btn" onclick="uploadRegisterAvatar()">
+                        <i class="fas fa-camera"></i> Загрузить фото профиля
+                    </button>
+                </div>
                 <div class="form-group">
                     <label for="registerName">Имя пользователя</label>
                     <input type="text" id="registerName" placeholder="Придумайте имя">
@@ -878,7 +1019,7 @@
                         <textarea id="postContent" placeholder="Что нового?" rows="4"></textarea>
                         <div class="post-actions">
                             <div class="action-icons">
-                                <button onclick="openCloudinaryWidget()" title="Добавить изображение">
+                                <button onclick="openCloudinaryWidget('post')" title="Добавить изображение">
                                     <i class="fas fa-image"></i>
                                 </button>
                                 <button onclick="selectChannelForPost()" title="Выбрать канал">
@@ -927,16 +1068,52 @@
                 <button class="close-btn" onclick="closeChannelModal()">&times;</button>
             </div>
             <div class="modal-body">
+                <div class="avatar-upload">
+                    <img id="channelAvatarPreview" src="https://ui-avatars.com/api/?name=Канал&background=1d9bf0&color=fff" 
+                         class="channel-avatar-preview" alt="Аватар канала" onclick="uploadChannelAvatar()">
+                    <button class="upload-btn" onclick="uploadChannelAvatar()">
+                        <i class="fas fa-camera"></i> Загрузить фото канала
+                    </button>
+                </div>
                 <div class="form-group">
                     <label for="channelName">Название канала</label>
                     <input type="text" id="channelName" placeholder="Название вашего канала">
                 </div>
                 <div class="form-group">
                     <label for="channelDescription">Описание</label>
-                    <textarea id="channelDescription" placeholder="Опишите тему канала" rows="3" style="width: 100%; padding: 12px; background: #253341; border: 1px solid #2f3336; border-radius: 8px; color: white;"></textarea>
+                    <textarea id="channelDescription" placeholder="Опишите тему канала" rows="3"></textarea>
                 </div>
                 <button class="auth-btn" onclick="createChannel()" id="createChannelBtn">
                     Создать канал
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно редактирования профиля -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Редактировать профиль</h3>
+                <button class="close-btn" onclick="closeEditProfileModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="avatar-upload">
+                    <img id="editProfileAvatarPreview" src="" class="avatar-preview" alt="Аватар" onclick="uploadEditProfileAvatar()">
+                    <button class="upload-btn" onclick="uploadEditProfileAvatar()">
+                        <i class="fas fa-camera"></i> Сменить фото профиля
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label for="editProfileName">Имя пользователя</label>
+                    <input type="text" id="editProfileName" placeholder="Ваше имя">
+                </div>
+                <div class="form-group">
+                    <label for="editProfileBio">О себе</label>
+                    <textarea id="editProfileBio" placeholder="Расскажите о себе" rows="3"></textarea>
+                </div>
+                <button class="auth-btn" onclick="updateProfile()" id="updateProfileBtn">
+                    Сохранить изменения
                 </button>
             </div>
         </div>
@@ -958,9 +1135,9 @@
 
         // Cloudinary конфигурация (БЕСПЛАТНЫЙ АККАУНТ ДЛЯ ТЕСТА)
         const cloudinaryConfig = {
-            cloudName: 'dtm41qpxc', // Мой тестовый cloud_name
-            uploadPreset: 'ml_default', // Стандартный preset
-            apiKey: 'demo_key' // Для виджета не нужен api_key
+            cloudName: 'dtm41qpxc',
+            uploadPreset: 'ml_default',
+            apiKey: 'demo_key'
         };
 
         // ========== ИНИЦИАЛИЗАЦИЯ ==========
@@ -973,19 +1150,27 @@
 
         // Глобальные переменные
         let currentUser = null;
+        let currentUserData = null;
         let unsubscribePosts = null;
         let unsubscribeChannels = null;
         let currentImageUrl = null;
         let selectedChannelId = null;
         let selectedChannelName = null;
         let currentView = 'feed';
+        let registerAvatarUrl = null;
+        let channelAvatarUrl = null;
+        let editProfileAvatarUrl = null;
 
         // ========== АУТЕНТИФИКАЦИЯ ==========
         // Проверяем состояние аутентификации при загрузке
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
                 console.log("Пользователь вошел:", user.email);
+                
+                // Загружаем данные пользователя из Firestore
+                await loadUserData();
+                
                 showMainApp();
                 updateUserUI();
                 
@@ -1005,6 +1190,30 @@
             }
         });
 
+        // Загрузка данных пользователя из Firestore
+        async function loadUserData() {
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists) {
+                    currentUserData = userDoc.data();
+                } else {
+                    // Создаем запись если не существует
+                    currentUserData = {
+                        uid: currentUser.uid,
+                        displayName: currentUser.displayName || 'Пользователь',
+                        email: currentUser.email,
+                        photoURL: currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName || 'User')}&background=1d9bf0`,
+                        bio: '',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        channels: []
+                    };
+                    await db.collection('users').doc(currentUser.uid).set(currentUserData);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки данных пользователя:', error);
+            }
+        }
+
         // Функции аутентификации
         window.showAuthForm = function(form) {
             document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
@@ -1017,6 +1226,10 @@
                 document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
                 document.getElementById('registerForm').classList.add('active');
             }
+        };
+
+        window.uploadRegisterAvatar = function() {
+            openCloudinaryWidget('register');
         };
 
         window.login = async function() {
@@ -1072,10 +1285,13 @@
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 
+                // Используем загруженное фото или стандартное
+                const avatarUrl = registerAvatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1d9bf0&color=fff`;
+                
                 // Обновляем профиль
                 await userCredential.user.updateProfile({
                     displayName: name,
-                    photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1d9bf0&color=fff`
+                    photoURL: avatarUrl
                 });
                 
                 // Создаем запись пользователя в Firestore
@@ -1083,7 +1299,8 @@
                     uid: userCredential.user.uid,
                     displayName: name,
                     email: email,
-                    photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1d9bf0&color=fff`,
+                    photoURL: avatarUrl,
+                    bio: '',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     channels: []
                 });
@@ -1109,32 +1326,19 @@
             }
         };
 
-        // ========== ПОСТЫ ==========
-        window.openPostModal = function() {
-            document.getElementById('postModal').style.display = 'flex';
-            document.getElementById('postContent').focus();
-        };
-
-        window.closePostModal = function() {
-            document.getElementById('postModal').style.display = 'none';
-            document.getElementById('postContent').value = '';
-            clearImagePreview();
-            clearSelectedChannel();
-        };
-
-        // Cloudinary Upload Widget
-        window.openCloudinaryWidget = function() {
+        // ========== CLOUDINARY UPLOAD ==========
+        window.openCloudinaryWidget = function(type = 'post') {
             const myWidget = cloudinary.createUploadWidget({
                 cloudName: cloudinaryConfig.cloudName,
                 uploadPreset: cloudinaryConfig.uploadPreset,
                 sources: ['local', 'url', 'camera'],
                 multiple: false,
-                maxFileSize: 5000000, // 5MB
+                maxFileSize: 5000000,
                 clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
                 maxImageWidth: 2000,
                 maxImageHeight: 2000,
-                cropping: true,
-                croppingAspectRatio: 16/9,
+                cropping: type === 'avatar' || type === 'channel',
+                croppingAspectRatio: type === 'avatar' ? 1 : 16/9,
                 showPoweredBy: false,
                 styles: {
                     palette: {
@@ -1155,9 +1359,33 @@
                 }
             }, (error, result) => {
                 if (!error && result && result.event === "success") {
-                    currentImageUrl = result.info.secure_url;
-                    showImagePreview(currentImageUrl);
-                    showNotification('Изображение загружено!', 'success');
+                    const imageUrl = result.info.secure_url;
+                    
+                    switch(type) {
+                        case 'post':
+                            currentImageUrl = imageUrl;
+                            showImagePreview(currentImageUrl);
+                            showNotification('Изображение загружено!', 'success');
+                            break;
+                            
+                        case 'register':
+                            registerAvatarUrl = imageUrl;
+                            document.getElementById('registerAvatarPreview').src = imageUrl;
+                            showNotification('Фото профиля загружено!', 'success');
+                            break;
+                            
+                        case 'channel':
+                            channelAvatarUrl = imageUrl;
+                            document.getElementById('channelAvatarPreview').src = imageUrl;
+                            showNotification('Фото канала загружено!', 'success');
+                            break;
+                            
+                        case 'editProfile':
+                            editProfileAvatarUrl = imageUrl;
+                            document.getElementById('editProfileAvatarPreview').src = imageUrl;
+                            showNotification('Фото профиля обновлено!', 'success');
+                            break;
+                    }
                 } else if (error) {
                     console.error('Cloudinary error:', error);
                     showNotification('Ошибка загрузки изображения', 'error');
@@ -1165,6 +1393,19 @@
             });
 
             myWidget.open();
+        };
+
+        // ========== ПОСТЫ ==========
+        window.openPostModal = function() {
+            document.getElementById('postModal').style.display = 'flex';
+            document.getElementById('postContent').focus();
+        };
+
+        window.closePostModal = function() {
+            document.getElementById('postModal').style.display = 'none';
+            document.getElementById('postContent').value = '';
+            clearImagePreview();
+            clearSelectedChannel();
         };
 
         function showImagePreview(imageUrl) {
@@ -1190,10 +1431,7 @@
         };
 
         window.openSelectChannelModal = function() {
-            // Показываем модальное окно
             document.getElementById('selectChannelModal').style.display = 'flex';
-            
-            // Загружаем каналы пользователя
             loadUserChannelsForSelection();
         };
 
@@ -1226,16 +1464,7 @@
                 
                 snapshot.forEach((doc) => {
                     const channel = doc.data();
-                    const channelElement = document.createElement('div');
-                    channelElement.className = 'channel-card';
-                    channelElement.innerHTML = `
-                        <div class="channel-icon">${channel.name.charAt(0).toUpperCase()}</div>
-                        <div class="channel-name">${channel.name}</div>
-                        <div class="channel-description">${channel.description || 'Без описания'}</div>
-                        <div class="channel-members">
-                            <i class="fas fa-user"></i> ${channel.memberCount || 1} участников
-                        </div>
-                    `;
+                    const channelElement = createChannelElement(doc.id, channel);
                     channelElement.onclick = () => {
                         selectedChannelId = doc.id;
                         selectedChannelName = channel.name;
@@ -1272,9 +1501,9 @@
                     userId: currentUser.uid,
                     userName: currentUser.displayName || 'Пользователь',
                     userAvatar: currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName || 'User')}&background=1d9bf0`,
-                    likes: 0,
                     likesCount: 0,
-                    comments: 0,
+                    likedBy: [], // Массив ID пользователей, которые поставили лайк
+                    commentsCount: 0,
                     channelId: selectedChannelId || null,
                     channelName: selectedChannelName || null,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1315,21 +1544,17 @@
             const postsContainer = document.getElementById('postsContainer');
             postsContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> Загрузка постов...</div>';
             
-            // Отписываемся от предыдущего слушателя, если он есть
-            if (unsubscribePosts) {
-                unsubscribePosts();
-            }
+            // Отписываемся от предыдущего слушателя
+            if (unsubscribePosts) unsubscribePosts();
             
             // Создаем запрос
             let postsQuery;
             if (channelId) {
-                // Посты только из определенного канала
                 postsQuery = db.collection('posts')
                     .where('channelId', '==', channelId)
                     .orderBy('timestamp', 'desc')
                     .limit(50);
             } else {
-                // Все посты
                 postsQuery = db.collection('posts')
                     .orderBy('timestamp', 'desc')
                     .limit(50);
@@ -1337,8 +1562,6 @@
             
             // Слушаем изменения в реальном времени
             unsubscribePosts = postsQuery.onSnapshot((snapshot) => {
-                console.log('Получено постов:', snapshot.size);
-                
                 if (snapshot.empty) {
                     postsContainer.innerHTML = `
                         <div class="post">
@@ -1375,6 +1598,9 @@
             const postDiv = document.createElement('div');
             postDiv.className = 'post';
             postDiv.dataset.id = post.id;
+            
+            // Проверяем, лайкнул ли текущий пользователь этот пост
+            const isLiked = post.likedBy && post.likedBy.includes(currentUser.uid);
             
             // Форматируем дату
             const date = post.createdAt ? post.createdAt.toDate() : new Date(post.timestamp);
@@ -1414,13 +1640,13 @@
                     ${imageHtml}
                 </div>
                 <div class="post-actions-bar">
-                    <div class="post-action" onclick="handleLike('${post.id}', ${post.likesCount || 0})">
-                        <i class="far fa-heart"></i>
+                    <div class="post-action ${isLiked ? 'liked' : ''}" onclick="handleLike('${post.id}', ${post.likesCount || 0}, ${JSON.stringify(post.likedBy || [])})">
+                        <i class="${isLiked ? 'fas' : 'far'} fa-heart"></i>
                         <span>${post.likesCount || 0}</span>
                     </div>
                     <div class="post-action" onclick="handleComment('${post.id}')">
                         <i class="far fa-comment"></i>
-                        <span>${post.comments || 0}</span>
+                        <span>${post.commentsCount || 0}</span>
                     </div>
                     <div class="post-action" onclick="handleShare('${post.id}')">
                         <i class="far fa-share-square"></i>
@@ -1431,6 +1657,38 @@
             return postDiv;
         }
 
+        // Обработка лайков (1 лайк на пользователя)
+        window.handleLike = async function(postId, currentLikes, likedBy) {
+            try {
+                const postRef = db.collection('posts').doc(postId);
+                const userId = currentUser.uid;
+                
+                // Проверяем, лайкнул ли уже пользователь этот пост
+                const alreadyLiked = likedBy && likedBy.includes(userId);
+                
+                if (alreadyLiked) {
+                    // Убираем лайк
+                    const updatedLikedBy = likedBy.filter(id => id !== userId);
+                    await postRef.update({
+                        likesCount: firebase.firestore.FieldValue.increment(-1),
+                        likedBy: updatedLikedBy
+                    });
+                    showNotification('Лайк убран', 'success');
+                } else {
+                    // Добавляем лайк
+                    const updatedLikedBy = [...(likedBy || []), userId];
+                    await postRef.update({
+                        likesCount: firebase.firestore.FieldValue.increment(1),
+                        likedBy: updatedLikedBy
+                    });
+                    showNotification('Лайк добавлен!', 'success');
+                }
+            } catch (error) {
+                console.error('Ошибка лайка:', error);
+                showNotification('Ошибка при обработке лайка', 'error');
+            }
+        };
+
         // ========== КАНАЛЫ ==========
         window.showChannels = function() {
             currentView = 'channels';
@@ -1438,12 +1696,10 @@
             document.getElementById('pageTitle').textContent = 'Каналы';
             document.getElementById('channelInfo').style.display = 'none';
             
-            // Показываем контейнер каналов, скрываем другие
             document.getElementById('postsContainer').style.display = 'none';
             document.getElementById('channelsContainer').style.display = 'block';
             document.getElementById('profileContainer').style.display = 'none';
             
-            // Загружаем каналы
             loadChannels();
         };
 
@@ -1453,12 +1709,10 @@
             document.getElementById('pageTitle').textContent = 'Все посты';
             document.getElementById('channelInfo').style.display = 'none';
             
-            // Показываем ленту, скрываем другие
             document.getElementById('postsContainer').style.display = 'block';
             document.getElementById('channelsContainer').style.display = 'none';
             document.getElementById('profileContainer').style.display = 'none';
             
-            // Загружаем все посты
             loadPosts();
         };
 
@@ -1466,19 +1720,13 @@
             const channelsList = document.getElementById('channelsList');
             channelsList.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> Загрузка каналов...</div>';
             
-            // Отписываемся от предыдущего слушателя
-            if (unsubscribeChannels) {
-                unsubscribeChannels();
-            }
+            if (unsubscribeChannels) unsubscribeChannels();
             
-            // Загружаем все каналы
             const channelsQuery = db.collection('channels')
                 .orderBy('memberCount', 'desc')
                 .limit(20);
             
             unsubscribeChannels = channelsQuery.onSnapshot((snapshot) => {
-                console.log('Получено каналов:', snapshot.size);
-                
                 if (snapshot.empty) {
                     channelsList.innerHTML = `
                         <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #8b98a5;">
@@ -1515,8 +1763,17 @@
             
             const channelElement = document.createElement('div');
             channelElement.className = 'channel-card';
+            
+            // Отображаем фото канала если есть
+            let channelIconHtml = '';
+            if (channel.avatarUrl) {
+                channelIconHtml = `<img src="${channel.avatarUrl}" alt="${channel.name}">`;
+            } else {
+                channelIconHtml = channel.name.charAt(0).toUpperCase();
+            }
+            
             channelElement.innerHTML = `
-                <div class="channel-icon">${channel.name.charAt(0).toUpperCase()}</div>
+                <div class="channel-icon">${channelIconHtml}</div>
                 <div class="channel-name">${channel.name}</div>
                 <div class="channel-description">${channel.description || 'Без описания'}</div>
                 <div class="channel-members">
@@ -1529,16 +1786,18 @@
             
             channelElement.onclick = () => {
                 if (isMember) {
-                    // Показать посты канала
                     showChannelPosts(channelId, channel.name);
                 } else {
-                    // Присоединиться к каналу
                     joinChannel(channelId);
                 }
             };
             
             return channelElement;
         }
+
+        window.uploadChannelAvatar = function() {
+            openCloudinaryWidget('channel');
+        };
 
         async function joinChannel(channelId) {
             try {
@@ -1558,20 +1817,16 @@
                     return;
                 }
                 
-                // Добавляем пользователя в канал
                 await channelRef.update({
                     members: [...members, currentUser.uid],
                     memberCount: firebase.firestore.FieldValue.increment(1)
                 });
                 
-                // Добавляем канал в список каналов пользователя
                 await db.collection('users').doc(currentUser.uid).update({
                     channels: firebase.firestore.FieldValue.arrayUnion(channelId)
                 });
                 
                 showNotification('Вы присоединились к каналу!', 'success');
-                
-                // Перезагружаем каналы
                 loadChannels();
                 
             } catch (error) {
@@ -1585,16 +1840,13 @@
             updateActiveTab('feedTab');
             document.getElementById('pageTitle').textContent = 'Лента';
             
-            // Показываем информацию о канале
             document.getElementById('currentChannelName').textContent = channelName;
             document.getElementById('channelInfo').style.display = 'block';
             
-            // Показываем ленту, скрываем другие
             document.getElementById('postsContainer').style.display = 'block';
             document.getElementById('channelsContainer').style.display = 'none';
             document.getElementById('profileContainer').style.display = 'none';
             
-            // Загружаем посты канала
             loadPosts(channelId);
         }
 
@@ -1606,6 +1858,8 @@
         window.openChannelModal = function() {
             document.getElementById('channelModal').style.display = 'flex';
             document.getElementById('channelName').focus();
+            channelAvatarUrl = null;
+            document.getElementById('channelAvatarPreview').src = 'https://ui-avatars.com/api/?name=Канал&background=1d9bf0&color=fff';
         };
 
         window.closeChannelModal = function() {
@@ -1636,6 +1890,7 @@
                 const channelData = {
                     name: name,
                     description: description,
+                    avatarUrl: channelAvatarUrl || null,
                     ownerId: currentUser.uid,
                     ownerName: currentUser.displayName,
                     members: [currentUser.uid],
@@ -1648,7 +1903,6 @@
                 const docRef = await db.collection('channels').add(channelData);
                 console.log('Канал создан с ID:', docRef.id);
                 
-                // Добавляем канал в список каналов пользователя
                 await db.collection('users').doc(currentUser.uid).update({
                     channels: firebase.firestore.FieldValue.arrayUnion(docRef.id)
                 });
@@ -1656,7 +1910,6 @@
                 showNotification(`Канал "${name}" создан!`, 'success');
                 closeChannelModal();
                 
-                // Переходим в канал
                 showChannelPosts(docRef.id, name);
                 
             } catch (error) {
@@ -1675,7 +1928,6 @@
             document.getElementById('pageTitle').textContent = 'Профиль';
             document.getElementById('channelInfo').style.display = 'none';
             
-            // Показываем профиль, скрываем другие
             document.getElementById('postsContainer').style.display = 'none';
             document.getElementById('channelsContainer').style.display = 'none';
             document.getElementById('profileContainer').style.display = 'block';
@@ -1684,29 +1936,38 @@
         };
 
         function loadProfile() {
+            if (!currentUserData) return;
+            
             const profileContainer = document.getElementById('profileContainer');
             
             profileContainer.innerHTML = `
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <img src="${currentUser.photoURL || 'https://ui-avatars.com/api/?name=User&background=1d9bf0'}" 
-                         style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px;">
-                    <h3>${currentUser.displayName || 'Пользователь'}</h3>
+                <div class="profile-header">
+                    <img src="${currentUserData.photoURL || 'https://ui-avatars.com/api/?name=User&background=1d9bf0'}" 
+                         class="profile-avatar" alt="Аватар">
+                    <button class="edit-avatar-btn" onclick="openEditProfileModal()">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <h3>${currentUserData.displayName || 'Пользователь'}</h3>
                     <p style="color: #8b98a5;">${currentUser.email}</p>
+                    ${currentUserData.bio ? `<p style="margin-top: 10px; color: #e7e9ea;">${currentUserData.bio}</p>` : ''}
+                    <button class="cloudinary-button" onclick="openEditProfileModal()" style="margin-top: 15px;">
+                        <i class="fas fa-edit"></i> Редактировать профиль
+                    </button>
                 </div>
                 <div style="background: #253341; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
                     <h4 style="margin-bottom: 15px;">Статистика</h4>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                        <div style="text-align: center; padding: 15px; background: #15202b; border-radius: 8px;">
-                            <div style="font-size: 24px; font-weight: bold; color: #1d9bf0;" id="postCount">0</div>
-                            <div style="color: #8b98a5;">Постов</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="postCount">0</div>
+                            <div class="stat-label">Постов</div>
                         </div>
-                        <div style="text-align: center; padding: 15px; background: #15202b; border-radius: 8px;">
-                            <div style="font-size: 24px; font-weight: bold; color: #00ba7c;" id="channelCount">0</div>
-                            <div style="color: #8b98a5;">Каналов</div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="channelCount">0</div>
+                            <div class="stat-label">Каналов</div>
                         </div>
-                        <div style="text-align: center; padding: 15px; background: #15202b; border-radius: 8px;">
-                            <div style="font-size: 24px; font-weight: bold; color: #f91880;" id="likeCount">0</div>
-                            <div style="color: #8b98a5;">Лайков</div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="likeCount">0</div>
+                            <div class="stat-label">Лайков</div>
                         </div>
                     </div>
                 </div>
@@ -1718,30 +1979,33 @@
                 </div>
             `;
             
-            // Загружаем статистику
             loadUserStats();
-            // Загружаем каналы пользователя
             loadUserChannels();
         }
 
         async function loadUserStats() {
             try {
-                // Считаем посты пользователя
+                // Посты пользователя
                 const postsQuery = await db.collection('posts')
                     .where('userId', '==', currentUser.uid)
                     .get();
                 
                 document.getElementById('postCount').textContent = postsQuery.size;
                 
-                // Считаем каналы пользователя
+                // Каналы пользователя
                 const channelsQuery = await db.collection('channels')
                     .where('members', 'array-contains', currentUser.uid)
                     .get();
                 
                 document.getElementById('channelCount').textContent = channelsQuery.size;
                 
-                // Считаем общее количество лайков (нужно будет доработать)
-                document.getElementById('likeCount').textContent = '0';
+                // Общее количество лайков на постах пользователя
+                let totalLikes = 0;
+                postsQuery.forEach(doc => {
+                    const post = doc.data();
+                    totalLikes += post.likesCount || 0;
+                });
+                document.getElementById('likeCount').textContent = totalLikes;
                 
             } catch (error) {
                 console.error('Ошибка загрузки статистики:', error);
@@ -1779,6 +2043,92 @@
             }
         }
 
+        // Редактирование профиля
+        window.openEditProfileModal = function() {
+            document.getElementById('editProfileModal').style.display = 'flex';
+            document.getElementById('editProfileName').value = currentUserData.displayName || '';
+            document.getElementById('editProfileBio').value = currentUserData.bio || '';
+            document.getElementById('editProfileAvatarPreview').src = currentUserData.photoURL || 'https://ui-avatars.com/api/?name=User&background=1d9bf0';
+            editProfileAvatarUrl = null;
+        };
+
+        window.closeEditProfileModal = function() {
+            document.getElementById('editProfileModal').style.display = 'none';
+        };
+
+        window.uploadEditProfileAvatar = function() {
+            openCloudinaryWidget('editProfile');
+        };
+
+        window.updateProfile = async function() {
+            const name = document.getElementById('editProfileName').value.trim();
+            const bio = document.getElementById('editProfileBio').value.trim();
+            const updateBtn = document.getElementById('updateProfileBtn');
+            
+            if (!name) {
+                showNotification('Введите имя пользователя', 'error');
+                return;
+            }
+            
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Сохранение...';
+            updateBtn.disabled = true;
+            
+            try {
+                // Обновляем фото если было загружено новое
+                const newAvatarUrl = editProfileAvatarUrl || currentUserData.photoURL;
+                
+                // Обновляем профиль в Firebase Auth
+                await currentUser.updateProfile({
+                    displayName: name,
+                    photoURL: newAvatarUrl
+                });
+                
+                // Обновляем данные в Firestore
+                await db.collection('users').doc(currentUser.uid).update({
+                    displayName: name,
+                    photoURL: newAvatarUrl,
+                    bio: bio,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Обновляем текущие данные пользователя
+                currentUserData.displayName = name;
+                currentUserData.photoURL = newAvatarUrl;
+                currentUserData.bio = bio;
+                
+                // Обновляем все посты пользователя с новым именем и аватаром
+                const postsQuery = await db.collection('posts')
+                    .where('userId', '==', currentUser.uid)
+                    .get();
+                
+                const batch = db.batch();
+                postsQuery.forEach(doc => {
+                    const postRef = db.collection('posts').doc(doc.id);
+                    batch.update(postRef, {
+                        userName: name,
+                        userAvatar: newAvatarUrl
+                    });
+                });
+                
+                if (postsQuery.size > 0) {
+                    await batch.commit();
+                }
+                
+                // Обновляем UI
+                updateUserUI();
+                closeEditProfileModal();
+                
+                showNotification('Профиль обновлен!', 'success');
+                
+            } catch (error) {
+                console.error('Ошибка обновления профиля:', error);
+                showNotification('Ошибка обновления профиля: ' + error.message, 'error');
+            } finally {
+                updateBtn.innerHTML = 'Сохранить изменения';
+                updateBtn.disabled = false;
+            }
+        };
+
         // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
         function showAuthOverlay() {
             document.getElementById('authOverlay').style.display = 'flex';
@@ -1791,23 +2141,20 @@
         }
 
         function updateUserUI() {
-            if (currentUser) {
-                document.getElementById('userDisplayName').textContent = currentUser.displayName || 'Пользователь';
+            if (currentUser && currentUserData) {
+                document.getElementById('userDisplayName').textContent = currentUserData.displayName || 'Пользователь';
                 document.getElementById('userEmail').textContent = currentUser.email || '@пользователь';
-                document.getElementById('userAvatarImg').src = currentUser.photoURL || 'https://ui-avatars.com/api/?name=User&background=1d9bf0';
-                document.getElementById('modalUserAvatar').src = currentUser.photoURL || 'https://ui-avatars.com/api/?name=User&background=1d9bf0';
+                document.getElementById('userAvatarImg').src = currentUserData.photoURL || 'https://ui-avatars.com/api/?name=User&background=1d9bf0';
+                document.getElementById('modalUserAvatar').src = currentUserData.photoURL || 'https://ui-avatars.com/api/?name=User&background=1d9bf0';
             }
         }
 
         function updateActiveTab(activeTabId) {
-            // Убираем active у всех вкладок
             document.querySelectorAll('.nav-item').forEach(tab => tab.classList.remove('active'));
-            // Добавляем active к выбранной вкладке
             document.getElementById(activeTabId).classList.add('active');
         }
 
         function showNotification(message, type = 'info') {
-            // Удаляем старые уведомления
             document.querySelectorAll('.notification').forEach(el => el.remove());
             
             const notification = document.createElement('div');
@@ -1819,7 +2166,6 @@
             
             document.body.appendChild(notification);
             
-            // Удаляем через 5 секунд
             setTimeout(() => {
                 if (notification.parentNode) {
                     notification.remove();
@@ -1855,18 +2201,6 @@
             if (minutes > 0) return `${minutes} мин. назад`;
             return 'Только что';
         }
-
-        window.handleLike = async function(postId, currentLikes) {
-            try {
-                const postRef = db.collection('posts').doc(postId);
-                await postRef.update({
-                    likesCount: firebase.firestore.FieldValue.increment(1)
-                });
-                showNotification('Лайк добавлен!', 'success');
-            } catch (error) {
-                console.error('Ошибка лайка:', error);
-            }
-        };
 
         window.handleComment = function(postId) {
             showNotification('Функция комментариев скоро будет доступна!', 'success');
@@ -1904,13 +2238,12 @@
 
         // Горячие клавиши
         document.addEventListener('keydown', function(e) {
-            // Escape для закрытия модальных окон
             if (e.key === 'Escape') {
                 closePostModal();
                 closeChannelModal();
                 closeSelectChannelModal();
+                closeEditProfileModal();
             }
-            // Ctrl+Enter для публикации поста
             if (e.ctrlKey && e.key === 'Enter' && document.getElementById('postModal').style.display === 'flex') {
                 createPost();
             }
@@ -1927,7 +2260,6 @@
         // Показываем окно аутентификации при загрузке
         showAuthOverlay();
 
-        // Инициализируем Cloudinary
         console.log('Cloudinary готов к использованию');
 
     </script>
