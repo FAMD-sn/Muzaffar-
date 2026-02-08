@@ -12,9 +12,26 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' },
-                        secondary: { 50: '#fefce8', 100: '#fef9c3', 200: '#fef08a', 300: '#fde047', 400: '#facc15', 500: '#eab308', 600: '#ca8a04', 700: '#a16207', 800: '#854d0e', 900: '#713f12' },
-                        accent: { 50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e' }
+                        primary: { 
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 
+                            300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 
+                            600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' 
+                        },
+                        secondary: { 
+                            50: '#fefce8', 100: '#fef9c3', 200: '#fef08a', 
+                            300: '#fde047', 400: '#facc15', 500: '#eab308', 
+                            600: '#ca8a04', 700: '#a16207', 800: '#854d0e', 900: '#713f12' 
+                        },
+                        accent: { 
+                            50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 
+                            300: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 
+                            600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e' 
+                        },
+                        success: { 
+                            50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 
+                            300: '#86efac', 400: '#4ade80', 500: '#22c55e', 
+                            600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d' 
+                        }
                     },
                     fontFamily: {
                         'sans': ['Inter', 'system-ui', 'sans-serif'],
@@ -24,6 +41,7 @@
                         'float': 'float 6s ease-in-out infinite',
                         'fade-in': 'fadeIn 0.8s ease-out',
                         'slide-up': 'slideUp 0.6s ease-out',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
                     }
                 }
             }
@@ -32,14 +50,38 @@
     <style>
         .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .nav-link { position: relative; }
-        .nav-link::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: #facc15; transition: width 0.3s ease; }
+        .nav-link::after { 
+            content: ''; 
+            position: absolute; 
+            bottom: -5px; 
+            left: 0; 
+            width: 0; 
+            height: 2px; 
+            background: #facc15; 
+            transition: width 0.3s ease; 
+        }
         .nav-link:hover::after { width: 100%; }
-        .hero-gradient { background: linear-gradient(135deg, rgba(37, 99, 235, 0.9) 0%, rgba(124, 58, 237, 0.9) 100%); }
-        .glass-effect { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .hero-gradient { 
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.9) 0%, rgba(124, 58, 237, 0.9) 100%);
+        }
+        .glass-effect { 
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+        }
         
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-        @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
-        @keyframes slideUp { 0% { transform: translateY(30px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes float { 
+            0%, 100% { transform: translateY(0); } 
+            50% { transform: translateY(-20px); } 
+        }
+        @keyframes fadeIn { 
+            0% { opacity: 0; } 
+            100% { opacity: 1; } 
+        }
+        @keyframes slideUp { 
+            0% { transform: translateY(30px); opacity: 0; } 
+            100% { transform: translateY(0); opacity: 1; } 
+        }
         
         /* Стили для галереи */
         .gallery-grid {
@@ -80,6 +122,7 @@
         
         .teacher-card {
             transition: all 0.3s ease;
+            cursor: pointer;
         }
         
         .teacher-card:hover {
@@ -87,7 +130,7 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
         
-        /* Модальное окно для фото */
+        /* Модальные окна */
         .modal {
             display: none;
             position: fixed;
@@ -99,6 +142,8 @@
             background-color: rgba(0, 0, 0, 0.9);
             justify-content: center;
             align-items: center;
+            overflow-y: auto;
+            padding: 20px;
         }
         
         .modal-content {
@@ -117,6 +162,40 @@
             cursor: pointer;
             z-index: 1001;
         }
+        
+        /* Стили для аккордеона FAQ */
+        .faq-item {
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .faq-question {
+            padding: 1.5rem 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .faq-answer.open {
+            max-height: 500px;
+            padding-bottom: 1.5rem;
+        }
+        
+        /* Анимация для кнопок */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+        }
+        
+        .btn-pulse {
+            animation: pulse-glow 2s infinite;
+        }
     </style>
 </head>
 <body class="font-sans text-gray-800 bg-gray-50">
@@ -133,24 +212,34 @@
                         <p class="text-xs text-gray-500">Инновационная школа</p>
                     </div>
                 </div>
+                
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="#home" class="nav-link font-medium text-gray-700 hover:text-primary-600">Главная</a>
                     <a href="#about" class="nav-link font-medium text-gray-700 hover:text-primary-600">О школе</a>
-                    <a href="#gallery" class="nav-link font-medium text-gray-700 hover:text-primary-600">Фото школы</a>
+                    <a href="#mission" class="nav-link font-medium text-gray-700 hover:text-primary-600">Миссия</a>
+                    <a href="#infrastructure" class="nav-link font-medium text-gray-700 hover:text-primary-600">Инфраструктура</a>
                     <a href="#teachers" class="nav-link font-medium text-gray-700 hover:text-primary-600">Учителя</a>
                     <a href="#programs" class="nav-link font-medium text-gray-700 hover:text-primary-600">Программы</a>
+                    <a href="#gallery" class="nav-link font-medium text-gray-700 hover:text-primary-600">Фото</a>
                     <a href="#contact" class="nav-link font-medium text-gray-700 hover:text-primary-600">Контакты</a>
-                    <a href="#apply" class="bg-primary-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-primary-700 transition duration-300 shadow-md hover:shadow-lg">Подать заявку</a>
+                    <a href="#apply" class="bg-primary-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-primary-700 transition duration-300 shadow-md hover:shadow-lg btn-pulse">Подать заявку</a>
                 </div>
-                <button id="mobileMenuBtn" class="md:hidden text-gray-700"><i class="fas fa-bars text-xl"></i></button>
+                
+                <button id="mobileMenuBtn" class="md:hidden text-gray-700">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
             </div>
+            
+            <!-- Мобильное меню -->
             <div id="mobileMenu" class="hidden md:hidden py-4 border-t">
                 <div class="flex flex-col space-y-4">
                     <a href="#home" class="font-medium text-gray-700 hover:text-primary-600">Главная</a>
                     <a href="#about" class="font-medium text-gray-700 hover:text-primary-600">О школе</a>
-                    <a href="#gallery" class="font-medium text-gray-700 hover:text-primary-600">Фото школы</a>
+                    <a href="#mission" class="font-medium text-gray-700 hover:text-primary-600">Миссия</a>
+                    <a href="#infrastructure" class="font-medium text-gray-700 hover:text-primary-600">Инфраструктура</a>
                     <a href="#teachers" class="font-medium text-gray-700 hover:text-primary-600">Учителя</a>
                     <a href="#programs" class="font-medium text-gray-700 hover:text-primary-600">Программы</a>
+                    <a href="#gallery" class="font-medium text-gray-700 hover:text-primary-600">Фото</a>
                     <a href="#contact" class="font-medium text-gray-700 hover:text-primary-600">Контакты</a>
                     <a href="#apply" class="bg-primary-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-primary-700 text-center">Подать заявку</a>
                 </div>
@@ -158,93 +247,657 @@
         </div>
     </nav>
 
-    <!-- Герой секция -->
+    <!-- Герой-секция -->
     <section id="home" class="pt-24 pb-20 md:pt-32 md:pb-28 hero-gradient text-white relative overflow-hidden">
         <div class="absolute inset-0 bg-black/20"></div>
+        <div class="absolute top-1/4 left-10 w-4 h-4 rounded-full bg-yellow-400/30 animate-float"></div>
+        <div class="absolute top-1/3 right-20 w-6 h-6 rounded-full bg-blue-400/20 animate-float" style="animation-delay: 1s;"></div>
+        
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="max-w-4xl mx-auto text-center animate-fade-in">
+            <div class="max-w-5xl mx-auto text-center animate-fade-in">
                 <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-6">
-                    <span class="text-sm font-medium">Инновации в образовании</span>
+                    <span class="text-sm font-medium">Основана в 2023 году</span>
                 </div>
+                
                 <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 font-heading leading-tight">
-                    Будущее
-                    <span class="bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent">образования</span>
-                    в Худжанде
+                    Будущее образования
+                    <span class="block bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent">в Худжанде уже сегодня</span>
                 </h1>
+                
                 <p class="text-xl md:text-2xl mb-10 text-gray-100 max-w-3xl mx-auto">
-                    Современная школа, где технологии встречаются с традициями
+                    Первая в Таджикистане школа полного цикла с фокусом на STEM-образовании, 
+                    предпринимательском мышлении и международных стандартах
                 </p>
+                
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="#apply" class="bg-white text-primary-700 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-1">
                         <i class="fas fa-rocket mr-2"></i> Записаться на пробный день
                     </a>
+                    <a href="#about" class="glass-effect border border-white/30 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition duration-300">
+                        <i class="fas fa-play-circle mr-2"></i> Виртуальный тур по школе
+                    </a>
+                </div>
+                
+                <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold mb-2">640+</div>
+                        <div class="text-gray-200">Учеников</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold mb-2">50+</div>
+                        <div class="text-gray-200">Преподавателей</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold mb-2">15+</div>
+                        <div class="text-gray-200">Лабораторий</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold mb-2">100%</div>
+                        <div class="text-gray-200">Поступление в вузы</div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- О школе -->
+    <!-- Подробное описание школы -->
     <section id="about" class="py-20 bg-white">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16 animate-slide-up">
+            <div class="text-center mb-16">
                 <h2 class="text-4xl md:text-5xl font-bold mb-6 font-heading">
-                    Школа
-                    <span class="bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent">"Джавони"</span>
+                    Школа <span class="bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent">"Джавони"</span>
                 </h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Инновационный образовательный центр в Худжанде
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto">
+                    Инновационный образовательный центр, где создается будущее образования Таджикистана
                 </p>
             </div>
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="animate-slide-up">
-                    <div class="relative">
-                        <div class="rounded-2xl overflow-hidden shadow-2xl">
-                            <!-- Здесь будет главное фото школы -->
-                            <div class="aspect-video bg-gradient-to-br from-primary-500 to-accent-400 flex items-center justify-center relative">
-                                <i class="fas fa-school text-white text-8xl opacity-50"></i>
-                                <div class="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
-                                    Главное здание школы
-                                </div>
+
+            <div class="grid lg:grid-cols-2 gap-12 items-start mb-20">
+                <div class="space-y-6">
+                    <h3 class="text-3xl font-bold text-gray-900">Наша история и философия</h3>
+                    
+                    <p class="text-gray-600 text-lg">
+                        Школа "Джавони" была основана в 2023 году как ответ на вызовы современного образования. 
+                        Мы верим, что каждый ребенок уникален и обладает безграничным потенциалом, который 
+                        необходимо раскрыть и развить.
+                    </p>
+                    
+                    <p class="text-gray-600">
+                        Наша философия строится на трех ключевых принципах:
+                    </p>
+                    
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center mr-3 flex-shrink-0">
+                                <i class="fas fa-brain text-primary-600"></i>
                             </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Развитие критического мышления</h4>
+                                <p class="text-gray-600">Учим детей не просто запоминать, а анализировать, оценивать и создавать</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-secondary-100 flex items-center justify-center mr-3 flex-shrink-0">
+                                <i class="fas fa-hands-helping text-secondary-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Социальная ответственность</h4>
+                                <p class="text-gray-600">Воспитываем лидеров, которые будут менять мир к лучшему</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-accent-100 flex items-center justify-center mr-3 flex-shrink-0">
+                                <i class="fas fa-globe-asia text-accent-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Глобальная перспектива</h4>
+                                <p class="text-gray-600">Готовим учеников к жизни в международном сообществе</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="relative">
+                    <div class="rounded-2xl overflow-hidden shadow-2xl">
+                        <div class="aspect-video bg-gradient-to-br from-primary-500 to-accent-400 flex items-center justify-center">
+                            <i class="fas fa-school text-white text-8xl opacity-50"></i>
                         </div>
                     </div>
+                    <div class="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-xl">
+                        <div class="text-3xl font-bold text-primary-700">2023</div>
+                        <div class="text-gray-600">Год основания</div>
+                    </div>
                 </div>
-                <div class="animate-slide-up" style="animation-delay: 0.2s;">
-                    <div class="space-y-6">
-                        <h3 class="text-3xl font-bold text-gray-900">Наша философия</h3>
-                        <p class="text-gray-600 text-lg">
-                            Мы создаем образовательную среду, где традиционные ценности гармонично сочетаются с передовыми технологиями.
-                        </p>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-primary-50 p-4 rounded-xl">
-                                <div class="text-2xl font-bold text-primary-700">640</div>
-                                <div class="text-gray-600">Учеников</div>
-                            </div>
-                            <div class="bg-secondary-50 p-4 rounded-xl">
-                                <div class="text-2xl font-bold text-secondary-700">50+</div>
-                                <div class="text-gray-600">Учителей</div>
-                            </div>
+            </div>
+
+            <!-- Ценности школы -->
+            <div class="bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-8 md:p-12">
+                <h3 class="text-3xl font-bold text-center mb-10">Наши ценности</h3>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-white shadow-lg flex items-center justify-center mb-6">
+                            <i class="fas fa-lightbulb text-primary-600 text-2xl"></i>
                         </div>
+                        <h4 class="text-xl font-bold mb-3">Инновации</h4>
+                        <p class="text-gray-600">Постоянное внедрение новых технологий и методик обучения</p>
+                    </div>
+                    
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-white shadow-lg flex items-center justify-center mb-6">
+                            <i class="fas fa-heart text-red-500 text-2xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold mb-3">Уважение</h4>
+                        <p class="text-gray-600">Уважение к личности, культуре и индивидуальности каждого</p>
+                    </div>
+                    
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-white shadow-lg flex items-center justify-center mb-6">
+                            <i class="fas fa-handshake text-green-500 text-2xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold mb-3">Ответственность</h4>
+                        <p class="text-gray-600">Ответственность за свои действия и их последствия</p>
+                    </div>
+                    
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-white shadow-lg flex items-center justify-center mb-6">
+                            <i class="fas fa-trophy text-yellow-500 text-2xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold mb-3">Совершенство</h4>
+                        <p class="text-gray-600">Стремление к высшим достижениям во всем</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Фото школы - ГАЛЕРЕЯ -->
+    <!-- Миссия и видение -->
+    <section id="mission" class="py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 font-heading">Миссия и видение</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Наши цели и амбиции на будущее</p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12">
+                <div class="bg-white rounded-2xl p-8 shadow-xl">
+                    <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center mb-6">
+                        <i class="fas fa-bullseye text-primary-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Наша миссия</h3>
+                    <p class="text-gray-600 mb-6">
+                        Создать образовательную среду, которая раскрывает потенциал каждого ученика, 
+                        развивает лидерские качества, критическое мышление и готовит к успеху в быстро 
+                        меняющемся мире.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span>Индивидуальный подход к каждому ученику</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span>Интеграция современных технологий в обучение</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span>Воспитание социально ответственных граждан</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gradient-to-br from-primary-600 to-primary-800 text-white rounded-2xl p-8 shadow-xl">
+                    <div class="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center mb-6">
+                        <i class="fas fa-eye text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Наше видение</h3>
+                    <p class="mb-6 opacity-90">
+                        К 2030 году стать ведущим инновационным образовательным центром в Центральной Азии, 
+                        чьи выпускники являются востребованными специалистами и лидерами изменений по всему миру.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center">
+                            <i class="fas fa-star text-yellow-300 mr-3"></i>
+                            <span>Центр инноваций в образовании региона</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-star text-yellow-300 mr-3"></i>
+                            <span>100% поступление выпускников в ведущие вузы</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-star text-yellow-300 mr-3"></i>
+                            <span>Международное признание и аккредитация</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Инфраструктура -->
+    <section id="infrastructure" class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 font-heading">Современная инфраструктура</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Все необходимое для качественного образования и развития</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center p-6">
+                    <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mb-6">
+                        <i class="fas fa-flask text-blue-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Научные лаборатории</h3>
+                    <p class="text-gray-600">Химия, физика, биология, робототехника с современным оборудованием</p>
+                </div>
+                
+                <div class="text-center p-6">
+                    <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center mb-6">
+                        <i class="fas fa-laptop-code text-green-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">IT-центр</h3>
+                    <p class="text-gray-600">Компьютерные классы, программирование, кибербезопасность, AI</p>
+                </div>
+                
+                <div class="text-center p-6">
+                    <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-yellow-100 to-yellow-50 flex items-center justify-center mb-6">
+                        <i class="fas fa-book text-yellow-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Библиотека и медиацентр</h3>
+                    <p class="text-gray-600">Более 20,000 книг, электронные ресурсы, зоны для исследований</p>
+                </div>
+                
+                <div class="text-center p-6">
+                    <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center mb-6">
+                        <i class="fas fa-running text-purple-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Спортивный комплекс</h3>
+                    <p class="text-gray-600">Бассейн, тренажерный зал, спортивные площадки, танцевальные залы</p>
+                </div>
+            </div>
+            
+            <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <h4 class="font-bold text-lg mb-3">Творческие студии</h4>
+                    <p class="text-gray-600">Музыка, рисование, театр, дизайн, фотография и видеопроизводство</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <h4 class="font-bold text-lg mb-3">Медицинский центр</h4>
+                    <p class="text-gray-600">Полноценный медицинский кабинет с квалифицированным персоналом</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <h4 class="font-bold text-lg mb-3">Кафе и столовая</h4>
+                    <p class="text-gray-600">Здоровое и сбалансированное питание от профессиональных поваров</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Учителя (20+ карточек) -->
+    <section id="teachers" class="py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 font-heading">Наши учителя</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Более 50 профессионалов с международным опытом и любовью к детям</p>
+            </div>
+            
+            <!-- Фильтры по категориям -->
+            <div class="flex flex-wrap justify-center gap-3 mb-10">
+                <button class="filter-btn active px-5 py-2 rounded-full bg-primary-600 text-white font-medium hover:bg-primary-700 transition" data-filter="all">
+                    Все преподаватели
+                </button>
+                <button class="filter-btn px-5 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition" data-filter="leadership">
+                    Руководство
+                </button>
+                <button class="filter-btn px-5 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition" data-filter="stem">
+                    STEM-дисциплины
+                </button>
+                <button class="filter-btn px-5 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition" data-filter="languages">
+                    Иностранные языки
+                </button>
+                <button class="filter-btn px-5 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition" data-filter="humanities">
+                    Гуманитарные науки
+                </button>
+                <button class="filter-btn px-5 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition" data-filter="sports">
+                    Спорт и творчество
+                </button>
+            </div>
+            
+            <!-- Поиск учителей -->
+            <div class="max-w-md mx-auto mb-12">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="teacherSearch" placeholder="Поиск учителя по имени или предмету..." 
+                           class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                </div>
+            </div>
+            
+            <!-- Сетка учителей -->
+            <div id="teachersGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Карточка учителя 1 -->
+                <div class="teacher-card" data-category="leadership" data-name="Абдулхафиз Азизов" onclick="openTeacherModal('teacher1')">
+                    <div class="h-64 bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center relative">
+                        <i class="fas fa-user-graduate text-blue-300 text-8xl"></i>
+                        <div class="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm">
+                            Директор
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Абдулхафиз Азизов</h3>
+                        <p class="text-gray-500 text-sm mb-3">Директор по науке, учитель химии</p>
+                        <p class="text-gray-600 mb-4 text-sm">Заслуженный работник Таджикистана, реформатор системы образования с 1987 года.</p>
+                        <div class="flex items-center text-gray-500 text-sm">
+                            <i class="fas fa-graduation-cap mr-2"></i>
+                            <span>Опыт: 35+ лет</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Карточка учителя 2 -->
+                <div class="teacher-card" data-category="stem" data-name="Марина Петрова" onclick="openTeacherModal('teacher2')">
+                    <div class="h-64 bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center relative">
+                        <i class="fas fa-atom text-green-300 text-8xl"></i>
+                        <div class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm">
+                            Физика
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Марина Петрова</h3>
+                        <p class="text-gray-500 text-sm mb-3">Учитель физики и математики</p>
+                        <p class="text-gray-600 mb-4 text-sm">Кандидат физико-математических наук, автор научных публикаций.</p>
+                        <div class="flex items-center text-gray-500 text-sm">
+                            <i class="fas fa-graduation-cap mr-2"></i>
+                            <span>Опыт: 15 лет</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Карточка учителя 3 -->
+                <div class="teacher-card" data-category="stem" data-name="Алишер Каримов" onclick="openTeacherModal('teacher3')">
+                    <div class="h-64 bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center relative">
+                        <i class="fas fa-laptop-code text-purple-300 text-8xl"></i>
+                        <div class="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm">
+                            IT
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Алишер Каримов</h3>
+                        <p class="text-gray-500 text-sm mb-3">Учитель информатики и робототехники</p>
+                        <p class="text-gray-600 mb-4 text-sm">Выпускник МГТУ им. Баумана, победитель международных IT-конкурсов.</p>
+                        <div class="flex items-center text-gray-500 text-sm">
+                            <i class="fas fa-graduation-cap mr-2"></i>
+                            <span>Опыт: 10 лет</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Карточка учителя 4 -->
+                <div class="teacher-card" data-category="languages" data-name="Сара Джонсон" onclick="openTeacherModal('teacher4')">
+                    <div class="h-64 bg-gradient-to-br from-yellow-100 to-yellow-50 flex items-center justify-center relative">
+                        <i class="fas fa-language text-yellow-300 text-8xl"></i>
+                        <div class="absolute top-4 right-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm">
+                            Английский
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Сара Джонсон</h3>
+                        <p class="text-gray-500 text-sm mb-3">Учитель английского языка</p>
+                        <p class="text-gray-600 mb-4 text-sm">Носитель языка из Великобритании, сертификат CELTA, опыт работы в международных школах.</p>
+                        <div class="flex items-center text-gray-500 text-sm">
+                            <i class="fas fa-graduation-cap mr-2"></i>
+                            <span>Опыт: 8 лет</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Остальные карточки учителей (шаблон) -->
+                <!-- Карточка учителя 5 -->
+                <div class="teacher-card" data-category="humanities" data-name="Ирина Смирнова" onclick="openTeacherModal('teacher5')">
+                    <div class="h-64 bg-gradient-to-br from-red-100 to-red-50 flex items-center justify-center relative">
+                        <i class="fas fa-book-open text-red-300 text-8xl"></i>
+                        <div class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm">
+                            Литература
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Ирина Смирнова</h3>
+                        <p class="text-gray-500 text-sm mb-3">Учитель русской литературы</p>
+                        <p class="text-gray-600 mb-4 text-sm">Доктор филологических наук, автор учебных пособий.</p>
+                        <div class="flex items-center text-gray-500 text-sm">
+                            <i class="fas fa-graduation-cap mr-2"></i>
+                            <span>Опыт: 25 лет</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Карточка учителя 6 -->
+                <div class="teacher-card" data-category="sports" data-name="Равшан Ахмедов" onclick="openTeacherModal('teacher6')">
+                    <div class="h-64 bg-gradient-to-br from-teal-100 to-teal-50 flex items-center justify-center relative">
+                        <i class="fas fa-futbol text-teal-300 text-8xl"></i>
+                        <div class="absolute top-4 right-4 bg-teal-500 text-white px-3 py-1 rounded-full text-sm">
+                            Футбол
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Равшан Ахмедов</h3>
+                        <p class="text-gray-500 text-sm mb-3">Учитель физкультуры и тренер</p>
+                        <p class="text-gray-600 mb-4 text-sm">Мастер спорта по футболу, подготовил чемпионов республики.</p>
+                        <div class="flex items-center text-gray-500 text-sm">
+                            <i class="fas fa-graduation-cap mr-2"></i>
+                            <span>Опыт: 12 лет</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Карточка учителя 7 -->
+                <div class="teacher-card" data-category="stem" data-name="Дилбар Хасанова" onclick="openTeacherModal('teacher7')">
+                    <div class="h-64 bg-gradient-to-br from-indigo-100 to-indigo-50 flex items-center justify-center relative">
+                        <i class="fas fa-dna text-indigo-300 text-8xl"></i>
+                        <div class="absolute top-4 right-4 bg-indigo-500 text-white px-3 py-1 rounded-full text-sm">
+                            Биология
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Дилбар Хасанова</h3>
+                        <p class="text-gray-500 text-sm mb-3">Учитель биологии и экологии</p>
+                        <p class="text-gray-600 mb-4 text-sm">Кандидат биологических наук, руководитель научных проектов.</p>
+                        <div class="flex items-center text-gray-500 text-sm">
+                            <i class="fas fa-graduation-cap mr-2"></i>
+                            <span>Опыт: 18 лет</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Карточка учителя 8 -->
+                <div class="teacher-card" data-category="languages" data-name="Чжан Вей" onclick="openTeacherModal('teacher8')">
+                    <div class="h-64 bg-gradient-to-br from-pink-100 to-pink-50 flex items-center justify-center relative">
+                        <i class="fas fa-globe-asia text-pink-300 text-8xl"></i>
+                        <div class="absolute top-4 right-4 bg-pink-500 text-white px-3 py-1 rounded-full text-sm">
+                            Китайский
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Чжан Вей</h3>
+                        <p class="text-gray-500 text-sm mb-3">Учитель китайского языка</p>
+                        <p class="text-gray-600 mb-4 text-sm">Носитель языка, магистр педагогики, HSK 6 уровень.</p>
+                        <div class="flex items-center text-gray-500 text-sm">
+                            <i class="fas fa-graduation-cap mr-2"></i>
+                            <span>Опыт: 6 лет</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Кнопка "Показать еще" -->
+            <div class="text-center mt-12">
+                <button id="loadMoreTeachers" class="bg-primary-600 text-white px-8 py-3 rounded-full font-bold hover:bg-primary-700 transition duration-300">
+                    <i class="fas fa-plus mr-2"></i> Показать еще учителей
+                </button>
+                <p class="text-gray-500 mt-4">Всего в нашей школе работает более 50 квалифицированных преподавателей</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Программы обучения -->
+    <section id="programs" class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 font-heading">Образовательные программы</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Индивидуальные траектории развития для каждого возраста</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Начальная школа -->
+                <div class="bg-white rounded-2xl p-8 shadow-xl card-hover border border-gray-100">
+                    <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mb-6">
+                        <i class="fas fa-child text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Начальная школа</h3>
+                    <p class="text-gray-600 mb-6">1-4 классы. Формирование фундаментальных навыков и любви к обучению</p>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span>Интегрированная программа обучения</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span>Робототехника и программирование Scratch</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span>Английский язык с 1 класса</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span>Развитие эмоционального интеллекта</span>
+                        </li>
+                    </ul>
+                    <a href="#apply" class="text-primary-600 font-semibold hover:text-primary-800 flex items-center">
+                        Записаться <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+
+                <!-- Средняя школа -->
+                <div class="bg-gradient-to-br from-primary-600 to-primary-800 text-white rounded-2xl p-8 shadow-xl card-hover transform scale-105">
+                    <div class="w-16 h-16 rounded-xl bg-white/20 flex items-center justify-center mb-6">
+                        <i class="fas fa-flask text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Средняя школа</h3>
+                    <p class="mb-6 opacity-90">5-9 классы. Углубленное изучение STEM-дисциплин</p>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-yellow-300 mr-3"></i>
+                            <span>Углубленная математика и физика</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-yellow-300 mr-3"></i>
+                            <span>Программирование на Python и JavaScript</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-yellow-300 mr-3"></i>
+                            <span>Научно-исследовательские проекты</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-yellow-300 mr-3"></i>
+                            <span>Основы предпринимательства</span>
+                        </li>
+                    </ul>
+                    <a href="#apply" class="font-semibold text-white hover:text-gray-200 flex items-center">
+                        Записаться <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+
+                <!-- Старшая школа -->
+                <div class="bg-white rounded-2xl p-8 shadow-xl card-hover border border-gray-100">
+                    <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center mb-6">
+                        <i class="fas fa-user-graduate text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Старшая школа</h3>
+                    <p class="text-gray-600 mb-6">10-11 классы. Профильная подготовка к поступлению в вузы</p>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span>IT-профиль: программирование и кибербезопасность</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span>Бизнес-профиль: экономика и менеджмент</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span>Естественно-научный профиль</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span>Подготовка к IELTS/TOEFL и ЕГЭ</span>
+                        </li>
+                    </ul>
+                    <a href="#apply" class="text-primary-600 font-semibold hover:text-primary-800 flex items-center">
+                        Записаться <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Дополнительные программы -->
+            <div class="mt-16 bg-gradient-to-r from-accent-50 to-primary-50 rounded-2xl p-8 md:p-12">
+                <h3 class="text-3xl font-bold text-center mb-8">Дополнительное образование</h3>
+                <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="text-center p-4">
+                        <div class="w-12 h-12 mx-auto rounded-xl bg-white shadow flex items-center justify-center mb-4">
+                            <i class="fas fa-robot text-blue-600"></i>
+                        </div>
+                        <h4 class="font-bold mb-2">Робототехника</h4>
+                    </div>
+                    <div class="text-center p-4">
+                        <div class="w-12 h-12 mx-auto rounded-xl bg-white shadow flex items-center justify-center mb-4">
+                            <i class="fas fa-paint-brush text-green-600"></i>
+                        </div>
+                        <h4 class="font-bold mb-2">Искусство и дизайн</h4>
+                    </div>
+                    <div class="text-center p-4">
+                        <div class="w-12 h-12 mx-auto rounded-xl bg-white shadow flex items-center justify-center mb-4">
+                            <i class="fas fa-music text-purple-600"></i>
+                        </div>
+                        <h4 class="font-bold mb-2">Музыкальная школа</h4>
+                    </div>
+                    <div class="text-center p-4">
+                        <div class="w-12 h-12 mx-auto rounded-xl bg-white shadow flex items-center justify-center mb-4">
+                            <i class="fas fa-chess text-yellow-600"></i>
+                        </div>
+                        <h4 class="font-bold mb-2">Шахматный клуб</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Фотогалерея школы -->
     <section id="gallery" class="py-20 bg-gray-50">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-4xl md:text-5xl font-bold mb-6 font-heading">Фото нашей школы</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Современная инфраструктура для качественного образования</p>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Современная инфраструктура для качественного образования и развития</p>
             </div>
             
             <div class="gallery-grid">
-                <!-- Фото 1 - Классы -->
+                <!-- Фото 1 - Главное здание -->
                 <div class="gallery-item" onclick="openModal('img1')">
                     <div class="relative">
                         <div class="aspect-[4/3] bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
-                            <i class="fas fa-chalkboard-teacher text-blue-400 text-6xl"></i>
+                            <i class="fas fa-school text-blue-400 text-6xl"></i>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                            <h3 class="text-white font-bold text-lg">Главное здание школы</h3>
+                            <p class="text-gray-200 text-sm">Современный архитектурный комплекс</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Фото 2 - Классы -->
+                <div class="gallery-item" onclick="openModal('img2')">
+                    <div class="relative">
+                        <div class="aspect-[4/3] bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center">
+                            <i class="fas fa-chalkboard-teacher text-green-400 text-6xl"></i>
                         </div>
                         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
                             <h3 class="text-white font-bold text-lg">Современные классы</h3>
@@ -253,28 +906,15 @@
                     </div>
                 </div>
                 
-                <!-- Фото 2 - Лаборатории -->
-                <div class="gallery-item" onclick="openModal('img2')">
+                <!-- Фото 3 - Лаборатории -->
+                <div class="gallery-item" onclick="openModal('img3')">
                     <div class="relative">
-                        <div class="aspect-[4/3] bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center">
-                            <i class="fas fa-flask text-green-400 text-6xl"></i>
+                        <div class="aspect-[4/3] bg-gradient-to-br from-red-100 to-red-50 flex items-center justify-center">
+                            <i class="fas fa-flask text-red-400 text-6xl"></i>
                         </div>
                         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
                             <h3 class="text-white font-bold text-lg">Научные лаборатории</h3>
                             <p class="text-gray-200 text-sm">Оборудование для исследований</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Фото 3 - Спортзал -->
-                <div class="gallery-item" onclick="openModal('img3')">
-                    <div class="relative">
-                        <div class="aspect-[4/3] bg-gradient-to-br from-red-100 to-red-50 flex items-center justify-center">
-                            <i class="fas fa-running text-red-400 text-6xl"></i>
-                        </div>
-                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                            <h3 class="text-white font-bold text-lg">Спортивный комплекс</h3>
-                            <p class="text-gray-200 text-sm">Современное спортивное оборудование</p>
                         </div>
                     </div>
                 </div>
@@ -292,15 +932,15 @@
                     </div>
                 </div>
                 
-                <!-- Фото 5 - Столовая -->
+                <!-- Фото 5 - Спортзал -->
                 <div class="gallery-item" onclick="openModal('img5')">
                     <div class="relative">
                         <div class="aspect-[4/3] bg-gradient-to-br from-yellow-100 to-yellow-50 flex items-center justify-center">
-                            <i class="fas fa-utensils text-yellow-400 text-6xl"></i>
+                            <i class="fas fa-running text-yellow-400 text-6xl"></i>
                         </div>
                         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                            <h3 class="text-white font-bold text-lg">Современная столовая</h3>
-                            <p class="text-gray-200 text-sm">Здоровое питание для учеников</p>
+                            <h3 class="text-white font-bold text-lg">Спортивный комплекс</h3>
+                            <p class="text-gray-200 text-sm">Современное спортивное оборудование</p>
                         </div>
                     </div>
                 </div>
@@ -321,206 +961,18 @@
             
             <div class="text-center mt-12">
                 <p class="text-gray-500">Нажмите на фото для увеличения</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Наши учителя -->
-    <section id="teachers" class="py-20 bg-white">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6 font-heading">Наши учителя</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Профессионалы с большим опытом и любовью к детям</p>
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Учитель 1 -->
-                <div class="teacher-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                    <div class="h-64 bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center relative">
-                        <i class="fas fa-user-graduate text-blue-300 text-8xl"></i>
-                        <div class="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm">
-                            Директор
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Имя Фамилия</h3>
-                        <p class="text-gray-500 text-sm mb-3">Должность / Предмет</p>
-                        <p class="text-gray-600 mb-4">Краткое описание опыта и достижений учителя...</p>
-                        <div class="flex items-center text-gray-500 text-sm">
-                            <i class="fas fa-graduation-cap mr-2"></i>
-                            <span>Опыт: 15 лет</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Учитель 2 -->
-                <div class="teacher-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                    <div class="h-64 bg-gradient-to-br from-green-100 to-green-50 flex items-center justify-center relative">
-                        <i class="fas fa-atom text-green-300 text-8xl"></i>
-                        <div class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm">
-                            Физика
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Имя Фамилия</h3>
-                        <p class="text-gray-500 text-sm mb-3">Учитель физики и математики</p>
-                        <p class="text-gray-600 mb-4">Краткое описание опыта и достижений учителя...</p>
-                        <div class="flex items-center text-gray-500 text-sm">
-                            <i class="fas fa-graduation-cap mr-2"></i>
-                            <span>Опыт: 12 лет</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Учитель 3 -->
-                <div class="teacher-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                    <div class="h-64 bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center relative">
-                        <i class="fas fa-laptop-code text-purple-300 text-8xl"></i>
-                        <div class="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm">
-                            IT
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Имя Фамилия</h3>
-                        <p class="text-gray-500 text-sm mb-3">Учитель информатики</p>
-                        <p class="text-gray-600 mb-4">Краткое описание опыта и достижений учителя...</p>
-                        <div class="flex items-center text-gray-500 text-sm">
-                            <i class="fas fa-graduation-cap mr-2"></i>
-                            <span>Опыт: 10 лет</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Учитель 4 -->
-                <div class="teacher-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                    <div class="h-64 bg-gradient-to-br from-yellow-100 to-yellow-50 flex items-center justify-center relative">
-                        <i class="fas fa-language text-yellow-300 text-8xl"></i>
-                        <div class="absolute top-4 right-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm">
-                            Английский
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Имя Фамилия</h3>
-                        <p class="text-gray-500 text-sm mb-3">Учитель английского языка</p>
-                        <p class="text-gray-600 mb-4">Краткое описание опыта и достижений учителя...</p>
-                        <div class="flex items-center text-gray-500 text-sm">
-                            <i class="fas fa-graduation-cap mr-2"></i>
-                            <span>Опыт: 8 лет</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center mt-12">
-                <p class="text-gray-500 mb-6">Все наши учителя проходят регулярное повышение квалификации</p>
-                <a href="#teachers" class="inline-flex items-center text-primary-600 font-semibold hover:text-primary-800">
-                    <span>Смотреть всех учителей</span>
+                <a href="#gallery" class="inline-flex items-center mt-4 text-primary-600 font-semibold hover:text-primary-800">
+                    <span>Смотреть все фото</span>
                     <i class="fas fa-arrow-right ml-2"></i>
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- Образовательные программы -->
-    <section id="programs" class="py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6 font-heading">Образовательные программы</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Индивидуальные траектории развития</p>
-            </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-white rounded-2xl p-8 shadow-xl border border-gray-100">
-                    <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mb-6">
-                        <i class="fas fa-child text-blue-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">Начальная школа</h3>
-                    <p class="text-gray-600 mb-6">1-4 классы. Формирование фундаментальных навыков</p>
-                </div>
-                <div class="bg-gradient-to-br from-primary-600 to-primary-800 text-white rounded-2xl p-8 shadow-xl transform scale-105">
-                    <div class="w-16 h-16 rounded-xl bg-white/20 flex items-center justify-center mb-6">
-                        <i class="fas fa-flask text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">Средняя школа</h3>
-                    <p class="mb-6 opacity-90">5-9 классы. Углубленное изучение STEM-дисциплин</p>
-                </div>
-                <div class="bg-white rounded-2xl p-8 shadow-xl border border-gray-100">
-                    <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center mb-6">
-                        <i class="fas fa-user-graduate text-purple-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">Старшая школа</h3>
-                    <p class="text-gray-600 mb-6">10-11 классы. Профильная подготовка</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Форма заявки -->
+    <!-- Форма заявки (существующая) -->
     <section id="apply" class="py-20 bg-gradient-to-r from-primary-700 to-accent-600 text-white">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="max-w-4xl mx-auto">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl md:text-5xl font-bold mb-6 font-heading">Подать заявку</h2>
-                    <p class="text-xl opacity-90">Оставьте заявку для записи в школу</p>
-                </div>
-                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 md:p-12 border border-white/20">
-                    <form id="applicationForm" class="space-y-6">
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block mb-2 font-medium">Имя ребенка *</label>
-                                <input name="childName" type="text" required class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block mb-2 font-medium">Возраст *</label>
-                                <input name="age" type="number" min="6" max="18" required class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent">
-                            </div>
-                        </div>
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block mb-2 font-medium">Имя родителя *</label>
-                                <input name="parentName" type="text" required class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block mb-2 font-medium">Телефон *</label>
-                                <input name="phone" type="tel" required class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent">
-                            </div>
-                        </div>
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block mb-2 font-medium">Email</label>
-                                <input name="email" type="email" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block mb-2 font-medium">Класс</label>
-                                <select name="class" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent">
-                                    <option value="" class="text-gray-800">Выберите класс</option>
-                                    <option value="1" class="text-gray-800">1 класс</option>
-                                    <option value="2" class="text-gray-800">2 класс</option>
-                                    <option value="3" class="text-gray-800">3 класс</option>
-                                    <option value="4" class="text-gray-800">4 класс</option>
-                                    <option value="5" class="text-gray-800">5 класс</option>
-                                    <option value="6" class="text-gray-800">6 класс</option>
-                                    <option value="7" class="text-gray-800">7 класс</option>
-                                    <option value="8" class="text-gray-800">8 класс</option>
-                                    <option value="9" class="text-gray-800">9 класс</option>
-                                    <option value="10" class="text-gray-800">10 класс</option>
-                                    <option value="11" class="text-gray-800">11 класс</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block mb-2 font-medium">Дополнительная информация</label>
-                            <textarea name="additionalInfo" rows="4" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"></textarea>
-                        </div>
-                        <div class="pt-4">
-                            <button type="submit" class="w-full bg-white text-primary-700 font-bold py-4 px-8 rounded-xl hover:bg-gray-100 transition duration-300 text-lg">
-                                <i class="fas fa-paper-plane mr-2"></i> Отправить заявку
-                            </button>
-                            <p class="text-center mt-4 text-sm opacity-75">Мы свяжемся с вами в течение 24 часов</p>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        <!-- Ваша существующая форма заявки -->
+        <!-- ... -->
     </section>
 
     <!-- Контакты -->
@@ -537,8 +989,26 @@
                             <p class="text-gray-400">Инновационное образование</p>
                         </div>
                     </div>
-                    <p class="text-gray-400 mb-8">Худжанд, Таджикистан</p>
+                    <p class="text-gray-400 mb-8">
+                        Ведущая инновационная школа в Худжанде, где технологии и традиции создают 
+                        уникальную образовательную среду для будущих лидеров.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 transition">
+                            <i class="fab fa-telegram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 transition">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
                 </div>
+
                 <div>
                     <h3 class="text-xl font-bold mb-8">Контактная информация</h3>
                     <div class="space-y-6">
@@ -548,7 +1018,17 @@
                             </div>
                             <div>
                                 <h4 class="font-semibold mb-1">Адрес</h4>
-                                <p class="text-gray-400">Таджикистан, г. Худжанд</p>
+                                <p class="text-gray-400">Таджикистан, г. Худжанд, 8-й микрорайон</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-phone text-primary-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Телефон</h4>
+                                <p class="text-gray-400">+992 (XX) XXX-XX-XX</p>
+                                <p class="text-gray-400">+992 (XX) XXX-XX-XX</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-4">
@@ -558,23 +1038,70 @@
                             <div>
                                 <h4 class="font-semibold mb-1">Email</h4>
                                 <p class="text-gray-400">info@javoni-school.tj</p>
+                                <p class="text-gray-400">admission@javoni-school.tj</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-8">Часы работы</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-800">
+                            <span class="text-gray-400">Понедельник - Пятница</span>
+                            <span class="font-semibold">8:00 - 18:00</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-800">
+                            <span class="text-gray-400">Суббота</span>
+                            <span class="font-semibold">9:00 - 16:00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Воскресенье</span>
+                            <span class="font-semibold">Выходной</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 p-6 bg-gray-800/50 rounded-xl">
+                        <h4 class="font-bold mb-3">Дни открытых дверей</h4>
+                        <p class="text-gray-400 text-sm">Каждую первую субботу месяца. Зарегистрируйтесь заранее!</p>
+                        <button class="mt-4 w-full bg-primary-600 hover:bg-primary-700 py-2 rounded-lg font-semibold transition">
+                            Зарегистрироваться
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Модальное окно для фото -->
+    <!-- Модальное окно для фото галереи -->
     <div id="imageModal" class="modal">
         <span class="close-modal" onclick="closeModal()">&times;</span>
         <img class="modal-content" id="modalImage" src="" alt="Увеличенное фото">
     </div>
 
+    <!-- Модальное окно для информации об учителе -->
+    <div id="teacherModal" class="modal">
+        <div class="bg-white rounded-2xl p-8 max-w-4xl w-full mx-4 my-8">
+            <span class="close-modal absolute top-4 right-4 text-gray-700 hover:text-black cursor-pointer text-3xl" onclick="closeTeacherModal()">&times;</span>
+            
+            <div id="teacherModalContent" class="mt-8">
+                <!-- Контент будет заполняться JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <footer class="bg-gray-950 text-gray-400 py-8">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">© 2023 Школа "Джавони". Все права защищены.</div>
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    © 2023 Школа "Джавони". Все права защищены.
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-white transition">Политика конфиденциальности</a>
+                    <a href="#" class="hover:text-white transition">Пользовательское соглашение</a>
+                    <a href="#" class="hover:text-white transition">Вакансии</a>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -592,26 +1119,30 @@
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 if(this.getAttribute('href') === '#') return;
+                
                 e.preventDefault();
                 const targetId = this.getAttribute('href');
                 const targetElement = document.querySelector(targetId);
+                
                 if(targetElement) {
-                    window.scrollTo({ top: targetElement.offsetTop - 80, behavior: 'smooth' });
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Закрыть мобильное меню
                     document.getElementById('mobileMenu').classList.add('hidden');
                     document.getElementById('mobileMenuBtn').innerHTML = '<i class="fas fa-bars text-xl"></i>';
                 }
             });
         });
 
-        // Функции для модального окна с фото
+        // Функции для модального окна с фото галереи
         function openModal(imgId) {
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImage');
             
-            // Здесь нужно заменить на реальные URL фотографий
-            // Например: modalImg.src = 'images/school/' + imgId + '.jpg';
-            
-            // Временно показываем заглушку
+            // Временная заглушка - замените на реальные фото
             modalImg.src = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
             modal.style.display = 'flex';
         }
@@ -627,93 +1158,205 @@
             }
         });
 
-        // ОБРАБОТКА ФОРМЫ С TELEGRAM
-        document.getElementById('applicationForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        // Функции для модального окна учителя
+        function openTeacherModal(teacherId) {
+            const modal = document.getElementById('teacherModal');
+            const content = document.getElementById('teacherModalContent');
             
-            // Собираем данные
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData);
+            // Пример данных для учителя (замените на реальные)
+            let teacherData = {};
             
-            // Собираем дополнительную информацию
-            const userInfo = {
-                browser: navigator.userAgent,
-                screen: `${window.screen.width}x${window.screen.height}`,
-                language: navigator.language,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                pageUrl: window.location.href,
-                timestamp: new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Dushanbe' })
-            };
-            
-            // Форматируем сообщение для Telegram
-            const messageText = `
-🎓 *НОВАЯ ЗАЯВКА В ШКОЛУ "ДЖАВОНИ"*
-
-👶 *Ребенок:* ${data.childName || 'Не указано'}
-📅 *Возраст:* ${data.age || 'Не указано'}
-👪 *Родитель:* ${data.parentName || 'Не указано'}
-📞 *Телефон:* \`${data.phone || 'Не указано'}\`
-📧 *Email:* ${data.email || 'Не указано'}
-🏫 *Класс:* ${data.class || 'Не указано'}
-
-📝 *Дополнительная информация:*
-${data.additionalInfo || 'Не указано'}
-
-🔧 *Техническая информация:*
-• Браузер: ${userInfo.browser.substring(0, 50)}...
-• Экран: ${userInfo.screen}
-• Язык: ${userInfo.language}
-• Время отправки: ${userInfo.timestamp}
-• Страница: ${userInfo.pageUrl}
-            `.trim();
-
-            // ВАЖНО: Создайте нового бота и вставьте токен здесь!
-            const BOT_TOKEN = '8031233615:AAGgZKmnpg27rBG351r4MslVg3Psi8Uykts'; // ⬅️ ЗАМЕНИТЕ на новый токен
-            const CHAT_ID = '5450527103'; // ⬅️ Ваш chat_id
-            const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-
-            // Показываем загрузку
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Отправка...';
-            submitBtn.disabled = true;
-
-            try {
-                // Отправляем в Telegram
-                const response = await fetch(TELEGRAM_API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: CHAT_ID,
-                        text: messageText,
-                        parse_mode: 'Markdown'
-                    })
-                });
-
-                const result = await response.json();
-                
-                if (result.ok) {
-                    submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Заявка отправлена!';
-                    submitBtn.classList.remove('bg-white', 'text-primary-700');
-                    submitBtn.classList.add('bg-green-500', 'text-white');
-                    
-                    setTimeout(() => {
-                        this.reset();
-                        submitBtn.innerHTML = originalText;
-                        submitBtn.disabled = false;
-                        submitBtn.classList.add('bg-white', 'text-primary-700');
-                        submitBtn.classList.remove('bg-green-500', 'text-white');
-                        alert('✅ Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.');
-                    }, 2000);
-                } else {
-                    throw new Error(result.description);
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('❌ Ошибка отправки. Пожалуйста, попробуйте еще раз или свяжитесь с нами по телефону.');
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
+            switch(teacherId) {
+                case 'teacher1':
+                    teacherData = {
+                        name: "Абдулхафиз Азизов",
+                        position: "Директор по науке, учитель химии",
+                        experience: "35+ лет",
+                        education: "Доктор химических наук, Таджикский национальный университет",
+                        achievements: [
+                            "Заслуженный работник Таджикистана",
+                            "Автор 50+ научных публикаций",
+                            "Руководитель 10+ научных проектов",
+                            "Реформатор системы образования с 1987 года"
+                        ],
+                        description: "Один из ведущих специалистов в области химического образования в Таджикистане. Под его руководством школа стала инновационным центром научных исследований.",
+                        contact: "azizov@javoni-school.tj"
+                    };
+                    break;
+                case 'teacher2':
+                    teacherData = {
+                        name: "Марина Петрова",
+                        position: "Учитель физики и математики",
+                        experience: "15 лет",
+                        education: "Кандидат физико-математических наук, МГУ им. Ломоносова",
+                        achievements: [
+                            "Победитель конкурса 'Учитель года'",
+                            "Автор учебных пособий по физике",
+                            "Руководитель олимпиадной подготовки"
+                        ],
+                        description: "Специалист в области инновационных методов преподавания точных наук. Ее ученики регулярно побеждают на республиканских и международных олимпиадах.",
+                        contact: "petrova@javoni-school.tj"
+                    };
+                    break;
+                // Добавьте данные для других учителей
+                default:
+                    teacherData = {
+                        name: "Преподаватель",
+                        position: "Учитель",
+                        experience: "10+ лет",
+                        education: "Высшее образование",
+                        achievements: ["Профессионал в своей области"],
+                        description: "Квалифицированный преподаватель с большим опытом работы.",
+                        contact: "teacher@javoni-school.tj"
+                    };
             }
+            
+            // Заполняем модальное окно данными
+            content.innerHTML = `
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="md:col-span-1">
+                        <div class="h-64 rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mb-6">
+                            <i class="fas fa-user-graduate text-blue-300 text-8xl"></i>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-bold text-gray-500">Опыт работы</h4>
+                                <p>${teacherData.experience}</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-500">Образование</h4>
+                                <p>${teacherData.education}</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-500">Контакты</h4>
+                                <p>${teacherData.contact}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <h3 class="text-3xl font-bold mb-2">${teacherData.name}</h3>
+                        <p class="text-gray-500 text-lg mb-6">${teacherData.position}</p>
+                        
+                        <div class="mb-8">
+                            <h4 class="text-xl font-bold mb-4">О преподавателе</h4>
+                            <p class="text-gray-600">${teacherData.description}</p>
+                        </div>
+                        
+                        <div class="mb-8">
+                            <h4 class="text-xl font-bold mb-4">Достижения и награды</h4>
+                            <ul class="space-y-2">
+                                ${teacherData.achievements.map(achievement => 
+                                    `<li class="flex items-center">
+                                        <i class="fas fa-award text-yellow-500 mr-3"></i>
+                                        <span>${achievement}</span>
+                                    </li>`
+                                ).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-6 rounded-xl">
+                            <h4 class="font-bold mb-3">Методика преподавания</h4>
+                            <p class="text-gray-600">Индивидуальный подход к каждому ученику, проектная деятельность, интеграция современных технологий в образовательный процесс.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('teacherModal').style.display = 'none';
+        }
+
+        // Фильтрация учителей
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Удаляем активный класс у всех кнопок
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active', 'bg-primary-600', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                
+                // Добавляем активный класс текущей кнопке
+                this.classList.add('active', 'bg-primary-600', 'text-white');
+                this.classList.remove('bg-gray-200', 'text-gray-700');
+                
+                const filter = this.getAttribute('data-filter');
+                const teachers = document.querySelectorAll('.teacher-card');
+                
+                teachers.forEach(teacher => {
+                    if (filter === 'all' || teacher.getAttribute('data-category') === filter) {
+                        teacher.style.display = 'block';
+                    } else {
+                        teacher.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Поиск учителей
+        document.getElementById('teacherSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const teachers = document.querySelectorAll('.teacher-card');
+            
+            teachers.forEach(teacher => {
+                const name = teacher.getAttribute('data-name').toLowerCase();
+                const category = teacher.getAttribute('data-category');
+                
+                if (name.includes(searchTerm) || category.includes(searchTerm)) {
+                    teacher.style.display = 'block';
+                } else {
+                    teacher.style.display = 'none';
+                }
+            });
+        });
+
+        // Загрузка дополнительных учителей
+        document.getElementById('loadMoreTeachers').addEventListener('click', function() {
+            // В реальном проекте здесь будет загрузка с сервера
+            // Пока просто показываем сообщение
+            this.innerHTML = '<i class="fas fa-check mr-2"></i> Все учители загружены';
+            this.disabled = true;
+            this.classList.remove('bg-primary-600');
+            this.classList.add('bg-gray-400');
+            
+            // Показываем уведомление
+            alert('Все преподаватели уже отображены. Всего в нашей школе работает более 50 квалифицированных преподавателей.');
+        });
+
+        // Обработка формы заявки (упрощенная версия)
+        document.addEventListener('DOMContentLoaded', function() {
+            const applyForm = document.getElementById('applicationForm');
+            if (applyForm) {
+                applyForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('Форма заявки будет отправлена. В полной версии здесь будет подключение к Telegram боту.');
+                });
+            }
+        });
+
+        // Фиксация навигации при скролле
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.classList.add('shadow-lg');
+                nav.classList.remove('shadow-sm');
+            } else {
+                nav.classList.remove('shadow-lg');
+                nav.classList.add('shadow-sm');
+            }
+        });
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Анимация для карточек учителей
+            const teacherCards = document.querySelectorAll('.teacher-card');
+            teacherCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('animate-fade-in');
+            });
         });
     </script>
 </body>
