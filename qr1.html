@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>MUZAFFAR BANK - QR Перевод</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+        background: #f5f5f5;
+    }
+    .container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+    button {
+        background: #1a4d2e;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    #qrcode {
+        margin: 20px 0;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🎯 QR-код для мгновенного перевода</h2>
+    
+    <div>
+        <label>Номер вашей карты:</label>
+        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" value="4044 4704 0385 2072">
+    </div>
+    
+    <div>
+        <label>Сумма (необязательно):</label>
+        <input type="number" id="amount" placeholder="1000">
+    </div>
+    
+    <div>
+        <label>Комментарий (необязательно):</label>
+        <input type="text" id="comment" placeholder="За обед">
+    </div>
+    
+    <button onclick="generateQR()">📱 Создать QR-код</button>
+    
+    <div id="qrcode"></div>
+    
+    <div id="linkContainer" style="display:none; margin-top:20px;">
+        <p><strong>Ссылка для перевода:</strong></p>
+        <input type="text" id="generatedLink" readonly style="width:100%; padding:10px;">
+        <button onclick="copyLink()">📋 Копировать ссылку</button>
+        <button onclick="testLink()">🔗 Протестировать</button>
+    </div>
+    
+    <div style="margin-top:30px; padding:15px; background:#e8f5e9; border-radius:5px;">
+        <h3>Как это работает:</h3>
+        <p>1. Создайте QR-код</p>
+        <p>2. Покажите его отправителю</p>
+        <p>3. Отправитель сканирует QR-код</p>
+        <p>4. Откроется страница с формой перевода</p>
+        <p>5. Номер карты будет уже заполнен!</p>
+    </div>
+</div>
+
+<script>
+let currentQRCode = null;
+
+function generateQR() {
+    let cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+    let amount = document.getElementById('amount').value;
+    let comment = document.getElementById('comment').value;
+    
+    if (!cardNumber || cardNumber.length !== 16) {
+        alert("Введите корректный номер карты (16 цифр)");
+        return;
+    }
+    
+    // Формируем ссылку
+    let link = window.location.origin + window.location.pathname + "?transfer=" + cardNumber;
+    
+    if (amount) {
+        link += "&amount=" + amount;
+    }
+    if (comment) {
+        link += "&comment=" + encodeURIComponent(comment);
+    }
+    
+    // Сохраняем ссылку
+    document.getElementById('generatedLink').value = link;
+    document.getElementById('linkContainer').style.display = 'block';
+    
+    // Создаем QR-код
+    document.getElementById('qrcode').innerHTML = '';
+    
+    try {
+        const qr = qrcode(0, 'M');
+        qr.addData(link);
+        qr.make();
+        
+        const canvas = document.createElement('canvas');
+        const size = 250;
+        const cells = qr.getModuleCount();
+        
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, size, size);
+        
+        ctx.fillStyle = '#000000';
+        const cellSize = size / cells;
+        
+        for (let row = 0; row < cells; row++) {
+            for (let col = 0; col < cells; col++) {
+                if (qr.isDark(row, col)) {
+                    ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                }
+            }
+        }
+        
+        document.getElementById('qrcode').appendChild(canvas);
+        currentQRCode = canvas;
+        
+        alert("✅ QR-код создан!\n\nСсылка: " + link);
+        
+    } catch (error) {
+        console.error(error);
+        alert("Ошибка создания QR-кода");
+    }
+}
+
+function copyLink() {
+    const linkInput = document.getElementById('generatedLink');
+    linkInput.select();
+    document.execCommand('copy');
+    alert("Ссылка скопирована!");
+}
+
+function testLink() {
+    const link = document.getElementById('generatedLink').value;
+    window.open(link, '_blank');
+}
+
+// Автоматическая обработка при открытии страницы
+window.addEventListener('load', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const cardNumber = urlParams.get('transfer');
+    const amount = urlParams.get('amount');
+    const comment = urlParams.get('comment');
+    
+    if (cardNumber) {
+        // Показываем форму перевода
+        showTransferForm(cardNumber, amount, comment);
+    }
+});
+
+function showTransferForm(cardNumber, amount, comment) {
+    // Создаем модальное окно
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 400px;
+        width: 90%;
+    `;
+    
+    const formattedCard = cardNumber.replace(/(\d{4})(?=\d)/g, '$1 ');
+    
+    modalContent.innerHTML = `
+        <h2>💸 Перевод средств</h2>
+        <p>Номер карты получателя: <strong>${formattedCard}</strong></p>
+        
+        <div style="margin: 20px 0;">
+            <label>Сумма перевода:</label>
+            <input type="number" id="transferAmount" value="${amount || ''}" placeholder="Введите сумму" style="width:100%; padding:10px; margin:5px 0;">
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <label>Комментарий:</label>
+            <input type="text" id="transferComment" value="${comment || ''}" placeholder="Назначение платежа" style="width:100%; padding:10px; margin:5px 0;">
+        </div>
+        
+        <button onclick="completeTransfer()" style="background:#1a4d2e; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">
+            Подтвердить перевод
+        </button>
+        
+        <button onclick="this.parentElement.parentElement.remove()" style="background:#ccc; color:black; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; margin-left:10px;">
+            Отмена
+        </button>
+    `;
+    
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+}
+
+function completeTransfer() {
+    alert("✅ Перевод выполнен успешно!\n\nСредства будут зачислены в течение минуты.");
+    
+    // Закрываем модальное окно
+    document.querySelector('div[style*="position: fixed"]')?.remove();
+}
+</script>
+
+</body>
+</html>
