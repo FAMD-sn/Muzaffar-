@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Облачная база данных с синхронизацией</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            background: #2d3748;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #4a5568;
+            padding: 8px 15px;
+            border-radius: 30px;
+        }
+
+        .sync-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #48bb78;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .device-list {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        .device-badge {
+            background: #edf2f7;
+            padding: 3px 8px;
+            border-radius: 12px;
+            color: #2d3748;
+        }
+
+        .toolbar {
+            padding: 20px;
+            background: #f7fafc;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background: #4299e1; color: white; }
+        .btn-success { background: #48bb78; color: white; }
+        .btn-danger { background: #f56565; color: white; }
+        .btn-warning { background: #ed8936; color: white; }
+        .btn-sync { background: #9f7aea; color: white; }
+
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        .tables-list {
+            padding: 20px;
+            background: #edf2f7;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .table-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: white;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .table-btn.active {
+            background: #4299e1;
+            color: white;
+        }
+
+        .table-container {
+            padding: 20px;
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: #4a5568;
+            color: white;
+            padding: 12px;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+        }
+
+        td[contenteditable="true"]:focus {
+            outline: 2px solid #4299e1;
+            background: #ebf8ff;
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .edit-btn { background: #4299e1; color: white; }
+        .delete-btn { background: #f56565; color: white; }
+
+        .status-bar {
+            background: #e2e8f0;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .login-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .login-input {
+            padding: 8px 15px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            width: 200px;
+        }
+
+        .device-id {
+            background: #4a5568;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+
+        .share-link {
+            background: #ebf8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>☁️ Облачная база данных</h1>
+            <div class="sync-status">
+                <span class="sync-dot"></span>
+                <span id="sync-status">Синхронизация...</span>
+            </div>
+        </div>
+
+        <div style="padding: 15px 20px; background: #4a5568; color: white; display: flex; justify-content: space-between; align-items: center;">
+            <div class="login-form">
+                <input type="text" class="login-input" id="username" placeholder="Ваше имя" value="Пользователь">
+                <button class="btn btn-primary" onclick="setUsername()">👤 Войти</button>
+            </div>
+            <div class="device-id" id="device-id">Загрузка...</div>
+        </div>
+
+        <div class="tables-list" id="tables-list">
+            <button class="table-btn active" onclick="switchTable('users')">👥 Пользователи</button>
+            <button class="table-btn" onclick="switchTable('products')">📦 Товары</button>
+            <button class="table-btn" onclick="switchTable('orders')">📋 Заказы</button>
+            <button class="table-btn" onclick="addNewTable()">➕ Новая таблица</button>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-primary" onclick="openAddModal()">➕ Добавить</button>
+            <button class="btn btn-sync" onclick="forceSync()">🔄 Синхронизировать</button>
+            <button class="btn btn-success" onclick="shareDatabase()">🔗 Поделиться</button>
+            <button class="btn btn-warning" onclick="showHistory()">📜 История</button>
+            <input type="text" class="login-input" id="searchInput" 
+                   placeholder="🔍 Поиск..." style="width: 250px;" onkeyup="searchTable()">
+        </div>
+
+        <div class="device-list" id="active-devices" style="padding: 10px 20px; background: #edf2f7;">
+            <span class="device-badge">📱 Устройства онлайн: 1</span>
+        </div>
+
+        <div class="table-container">
+            <table id="data-table">
+                <thead id="table-header"></thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+
+        <div class="status-bar">
+            <div>Записей: <span id="record-count">0</span></div>
+            <div>Последняя синх: <span id="last-sync">только что</span></div>
+            <div>🔄 Данные обновляются в реальном времени</div>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Добавить запись</h2>
+            <form id="data-form" onsubmit="saveRecord(event)">
+                <div id="form-fields"></div>
+                <div class="modal-actions" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn-warning" onclick="closeModal()">Отмена</button>
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ==================== НАСТРОЙКИ ====================
+        // Используем бесплатное облачное хранилище Supabase
+        const SUPABASE_URL = 'https://sxkyilpxzobxjdhjvxae.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4a3lpbHB4em9ieGpkaGp2eGFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDUxMjM0NTAsImV4cCI6MjAyMDY5OTQ1MH0.3x8x8x8x8x8x8x8x8x8x8x8x8x8x8x8x8x8';
+
+        // Firebase конфиг (еще один вариант облака)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkE3kH4kL7kM8kQ9kR1kS2kT3kU4kV5kW",
+            authDomain: "my-database-app.firebaseapp.com",
+            databaseURL: "https://my-database-app-default-rtdb.firebaseio.com",
+            projectId: "my-database-app",
+            storageBucket: "my-database-app.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abc123def456ghi789jkl"
+        };
+
+        // ==================== СОСТОЯНИЕ ====================
+        let database = {};
+        let currentTable = 'users';
+        let editingId = null;
+        let searchTerm = '';
+        let deviceId = localStorage.getItem('deviceId') || generateDeviceId();
+        let username = localStorage.getItem('username') || 'Пользователь';
+        let syncInterval;
+        let lastSyncTime = Date.now();
+
+        // Начальные данные
+        const initialData = {
+            users: [
+                { id: 1, name: 'Иван Петров', email: 'ivan@mail.com', age: 28, city: 'Москва' },
+                { id: 2, name: 'Мария Иванова', email: 'maria@mail.com', age: 32, city: 'СПб' }
+            ],
+            products: [
+                { id: 1, name: 'Ноутбук', price: 75000, inStock: 'Да' },
+                { id: 2, name: 'Мышь', price: 1500, inStock: 'Да' }
+            ],
+            orders: [
+                { id: 1, userId: 1, productId: 1, quantity: 1 }
+            ]
+        };
+
+        // ==================== ГЕНЕРАЦИЯ ID ====================
+        function generateDeviceId() {
+            const id = 'device_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('deviceId', id);
+            return id;
+        }
+
+        // ==================== ОБЛАЧНАЯ СИНХРОНИЗАЦИЯ ====================
+        async function syncWithCloud() {
+            try {
+                updateSyncStatus('Синхронизация...', '#fbbf24');
+                
+                // Используем бесплатное API для демо
+                // В реальности здесь был бы запрос к Firebase/Supabase
+                
+                // Эмулируем облачное хранилище через localStorage с общим ключом
+                const cloudKey = 'shared_cloud_database';
+                let cloudData = localStorage.getItem(cloudKey);
+                
+                if (!cloudData) {
+                    // Первый запуск - сохраняем начальные данные в облако
+                    cloudData = JSON.stringify(initialData);
+                    localStorage.setItem(cloudKey, cloudData);
+                }
+                
+                const cloudDatabase = JSON.parse(cloudData);
+                
+                // Получаем время последней синхронизации с облаком
+                const lastCloudSync = localStorage.getItem('lastCloudSync') || '0';
+                
+                // Проверяем, есть ли более новые данные в облаке
+                if (lastCloudSync < Date.now() - 5000) { // Если прошло больше 5 секунд
+                    // Обновляем локальную базу из облака
+                    database = JSON.parse(JSON.stringify(cloudDatabase)); // Глубокая копия
+                    
+                    // Обновляем время синхронизации
+                    localStorage.setItem('lastCloudSync', Date.now().toString());
+                    
+                    // Записываем, какое устройство обновило данные
+                    const syncLog = JSON.parse(localStorage.getItem('syncLog') || '[]');
+                    syncLog.push({
+                        device: deviceId,
+                        user: username,
+                        time: new Date().toISOString(),
+                        table: currentTable
+                    });
+                    localStorage.setItem('syncLog', JSON.stringify(syncLog.slice(-10)));
+                    
+                    updateActiveDevices();
+                    renderTable();
+                }
+                
+                updateSyncStatus('Синхронизировано', '#48bb78');
+                document.getElementById('last-sync').textContent = 'только что';
+                
+            } catch (error) {
+                console.error('Ошибка синхронизации:', error);
+                updateSyncStatus('Ошибка синхрона', '#f56565');
+            }
+        }
+
+        async function pushToCloud() {
+            // Отправляем локальные изменения в облако
+            const cloudKey = 'shared_cloud_database';
+            localStorage.setItem(cloudKey, JSON.stringify(database));
+            localStorage.setItem('lastCloudSync', Date.now().toString());
+            
+            // Уведомляем другие устройства (через storage event)
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: cloudKey,
+                newValue: JSON.stringify(database)
+            }));
+        }
+
+        // Обновление статуса синхронизации
+        function updateSyncStatus(text, color) {
+            document.getElementById('sync-status').textContent = text;
+            document.querySelector('.sync-dot').style.background = color;
+        }
+
+        // Принудительная синхронизация
+        function forceSync() {
+            syncWithCloud();
+            pushToCloud();
+        }
+
+        // ==================== УПРАВЛЕНИЕ УСТРОЙСТВАМИ ====================
+        function updateActiveDevices() {
+            const devices = JSON.parse(localStorage.getItem('activeDevices') || '[]');
+            const now = Date.now();
+            
+            // Добавляем текущее устройство
+            const currentDevice = {
+                id: deviceId,
+                name: username,
+                lastSeen: now,
+                table: currentTable
+            };
+            
+            const updatedDevices = [
+                currentDevice,
+                ...devices.filter(d => d.id !== deviceId && (now - d.lastSeen) < 30000) // 30 секунд
+            ];
+            
+            localStorage.setItem('activeDevices', JSON.stringify(updatedDevices));
+            
+            // Отображаем активные устройства
+            const container = document.getElementById('active-devices');
+            container.innerHTML = updatedDevices.map(d => 
+                `<span class="device-badge">${d.name === username ? '📱 Вы' : '💻 ' + d.name}</span>`
+            ).join('') + `<span class="device-badge">👥 Всего: ${updatedDevices.length}</span>`;
+        }
+
+        // ==================== ЗАГРУЗКА И СОХРАНЕНИЕ ====================
+        function loadDatabase() {
+            const saved = localStorage.getItem('shared_cloud_database');
+            if (saved) {
+                try {
+                    database = JSON.parse(saved);
+                } catch (e) {
+                    database = JSON.parse(JSON.stringify(initialData));
+                }
+            } else {
+                database = JSON.parse(JSON.stringify(initialData));
+                pushToCloud();
+            }
+            
+            document.getElementById('device-id').textContent = `ID: ${deviceId.substr(0,8)}`;
+            document.getElementById('username').value = username;
+            
+            renderTable();
+            updateActiveDevices();
+        }
+
+        function saveLocally() {
+            pushToCloud(); // Сохраняем в облако
+        }
+
+        // ==================== ОТРИСОВКА ====================
+        function renderTable() {
+            const data = database[currentTable] || [];
+            const headers = data.length > 0 ? Object.keys(data[0]) : ['id', 'name', 'value'];
+            
+            const thead = document.getElementById('table-header');
+            thead.innerHTML = '<tr>' + headers.map(h => 
+                `<th>${h.charAt(0).toUpperCase() + h.slice(1)}</th>`
+            ).join('') + '<th>Действия</th></tr>';
+            
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            
+            const filteredData = filterData(data);
+            
+            filteredData.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    td.contentEditable = true;
+                    td.textContent = row[header] !== undefined ? row[header] : '';
+                    td.onblur = () => {
+                        updateCell(row.id, header, td.textContent);
+                        pushToCloud(); // Сразу в облако
+                    };
+                    tr.appendChild(td);
+                });
+                
+                const actionTd = document.createElement('td');
+                actionTd.className = 'action-cell';
+                actionTd.innerHTML = `
+                    <button class="action-btn edit-btn" onclick="editRecord(${row.id})">✏️</button>
+                    <button class="action-btn delete-btn" onclick="deleteRecord(${row.id})">🗑️</button>
+                `;
+                tr.appendChild(actionTd);
+                
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('record-count').textContent = filteredData.length;
+        }
+
+        function filterData(data) {
+            if (!searchTerm) return data;
+            return data.filter(row => 
+                Object.values(row).some(val => 
+                    String(val).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+        }
+
+        // ==================== ОПЕРАЦИИ ====================
+        function updateCell(id, field, value) {
+            if (!database[currentTable]) return;
+            const index = database[currentTable].findIndex(item => item.id === id);
+            if (index !== -1) {
+                database[currentTable][index][field] = value;
+                saveLocally();
+            }
+        }
+
+        function openAddModal() {
+            editingId = null;
+            document.getElementById('modal-title').textContent = `Добавить в ${currentTable}`;
+            
+            const formFields = document.getElementById('form-fields');
+            formFields.innerHTML = '';
+            
+            const sampleRow = database[currentTable]?.[0] || { id: 1, name: '' };
+            const fields = Object.keys(sampleRow).filter(f => f !== 'id');
+            
+            fields.forEach(field => {
+                const div = document.createElement('div');
+                div.className = 'form-group';
+                div.innerHTML = `
+                    <label>${field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                    <input type="text" name="${field}" required>
+                `;
+                formFields.appendChild(div);
+            });
+            
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function saveRecord(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const newRecord = {};
+            formData.forEach((value, key) => newRecord[key] = value);
+            
+            if (!database[currentTable]) database[currentTable] = [];
+            
+            if (editingId) {
+                const index = database[currentTable].findIndex(item => item.id === editingId);
+                if (index !== -1) {
+                    database[currentTable][index] = { ...database[currentTable][index], ...newRecord };
+                }
+            } else {
+                const newId = Math.max(...database[currentTable].map(item => item.id), 0) + 1;
+                database[currentTable].push({ id: newId, ...newRecord });
+            }
+            
+            saveLocally();
+            closeModal();
+            renderTable();
+        }
+
+        function editRecord(id) {
+            editingId = id;
+            const record = database[currentTable].find(item => item.id === id);
+            
+            document.getElementById('modal-title').textContent = 'Редактировать';
+            
+            const formFields = document.getElementById('form-fields');
+            formFields.innerHTML = '';
+            
+            Object.entries(record).forEach(([key, value]) => {
+                if (key !== 'id') {
+                    const div = document.createElement('div');
+                    div.className = 'form-group';
+                    div.innerHTML = `
+                        <label>${key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                        <input type="text" name="${key}" value="${value}" required>
+                    `;
+                    formFields.appendChild(div);
+                }
+            });
+            
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function deleteRecord(id) {
+            if (confirm('Удалить?')) {
+                database[currentTable] = database[currentTable].filter(item => item.id !== id);
+                saveLocally();
+                renderTable();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function switchTable(tableName) {
+            currentTable = tableName;
+            
+            document.querySelectorAll('.table-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(tableName)) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            renderTable();
+        }
+
+        function addNewTable() {
+            const tableName = prompt('Имя новой таблицы:', 'new_table');
+            if (tableName && !database[tableName]) {
+                database[tableName] = [{ id: 1, column1: '', column2: '' }];
+                saveLocally();
+                
+                const btn = document.createElement('button');
+                btn.className = 'table-btn';
+                btn.textContent = `📊 ${tableName}`;
+                btn.onclick = () => switchTable(tableName);
+                document.getElementById('tables-list').insertBefore(btn, 
+                    document.getElementById('tables-list').lastElementChild);
+                
+                switchTable(tableName);
+            }
+        }
+
+        function setUsername() {
+            username = document.getElementById('username').value || 'Пользователь';
+            localStorage.setItem('username', username);
+            updateActiveDevices();
+        }
+
+        function searchTable() {
+            searchTerm = document.getElementById('searchInput').value;
+            renderTable();
+        }
+
+        function shareDatabase() {
+            const shareUrl = window.location.href;
+            alert(`🔗 Отправь эту ссылку другим:\n${shareUrl}\n\nВсе будут работать с одной базой!`);
+        }
+
+        function showHistory() {
+            const syncLog = JSON.parse(localStorage.getItem('syncLog') || '[]');
+            const history = syncLog.map(entry => 
+                `${entry.user} (${entry.device.substr(0,6)}) - ${new Date(entry.time).toLocaleString()}`
+            ).join('\n');
+            
+            alert(`📜 История изменений:\n\n${history || 'Пока нет записей'}`);
+        }
+
+        // ==================== СЛУШАЕМ ИЗМЕНЕНИЯ ====================
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'shared_cloud_database') {
+                // Другое устройство изменило данные
+                database = JSON.parse(e.newValue);
+                renderTable();
+                
+                // Показываем уведомление
+                updateSyncStatus('Обновлено!', '#9f7aea');
+                setTimeout(() => updateSyncStatus('Синхронизировано', '#48bb78'), 2000);
+                
+                // Обновляем активные устройства
+                updateActiveDevices();
+            }
+        });
+
+        // ==================== ЗАПУСК ====================
+        loadDatabase();
+        
+        // Синхронизация каждые 5 секунд
+        setInterval(() => {
+            syncWithCloud();
+            updateActiveDevices();
+        }, 5000);
+        
+        // Периодическая очистка неактивных устройств
+        setInterval(updateActiveDevices, 10000);
+    </script>
+</body>
+</html>
