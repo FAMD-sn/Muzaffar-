@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://muzaffar699.github.io/sitemap.xml
